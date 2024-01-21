@@ -5,6 +5,7 @@ function iniciaEventos() {
 }
 
 function borraPersona() {
+    let request = new XMLHttpRequest();
     let divMensaje = document.getElementById("mensaje");
     var personaABorrar = document.getElementById("entryPersona");
     request.open("GET", "https://crudpaco.azurewebsites.net/api/personas");
@@ -15,7 +16,7 @@ function borraPersona() {
         } else {
             if (request.readyState == 4 && request.status == 200) {
                 let apiEntera = JSON.parse(request.responseText);
-                if (apiEntera.includes(apiEntera[personaABorrar].ID = personaABorrar)) {
+                if (apiEntera.includes(apiEntera[personaABorrar].ID == personaABorrar)) {
                     divMensaje.innerHTML = "Persona borrada con éxito";
                 } else {
                     divMensaje.innerHTML = "ID no encontrada";
