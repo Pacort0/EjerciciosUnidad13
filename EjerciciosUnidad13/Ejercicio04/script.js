@@ -7,20 +7,21 @@ function iniciaEventos() {
 function borraPersona() {
     let request = new XMLHttpRequest();
     let divMensaje = document.getElementById("mensaje");
-    var personaABorrar = document.getElementById("entryPersona");
-    request.open("GET", "https://crudpaco.azurewebsites.net/api/personas");
+    var personaABorrar = document.getElementById("entryPersona").value;
+    request.open("DELETE", "https://crudpaco.azurewebsites.net/api/personas/" + personaABorrar);
 
     request.onreadystatechange = function () {
         if (request.readyState < 4) {
             divMensaje.innerHTML = "Cagando...";
         } else {
             if (request.readyState == 4 && request.status == 200) {
-                let apiEntera = JSON.parse(request.responseText);
-                if (apiEntera.includes(apiEntera[personaABorrar].ID == personaABorrar)) {
-                    divMensaje.innerHTML = "Persona borrada con éxito";
+                if (request.responseText>0) {
+                     divMensaje.innerHTML = "Persona borrada con éxito";
                 } else {
                     divMensaje.innerHTML = "ID no encontrada";
                 }
+            } else {
+                divMensaje.innerHTML = "Error en la request (la persona no existe)";
             }
         }
     };
