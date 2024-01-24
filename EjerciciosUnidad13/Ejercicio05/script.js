@@ -1,11 +1,17 @@
-﻿window.onload = tablaPersonas;
+﻿window.onload = inicializar;
 
+var divMensaje;
+var listaDepartamentos = [];
+function inicializar() {
+    divMensaje = document.getElementById("mensaje");
+    peticionDepartamentos();
+}
 const options = {
     method: "GET"
 };
-function tablaPersonas() {
+function peticionDepartamentos() {
     let tabla = document.getElementById("tablaPersonas");
-    let divMensaje = document.getElementById("mensaje");
+    divMensaje = document.getElementById("mensaje");
     var listaDepartamentos = [];
     var apiEntera = [];
 
