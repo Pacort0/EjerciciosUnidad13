@@ -2,16 +2,16 @@
 
 window.onload = inicioPagina;
 
-class DTOModelo{
-    constructor(id, precio) {
-        this.id = id;
-        this.precio = precio;
-    }   
+class DTOModelo {
+    constructor(Precio, Id) {
+        this.Id = Id;
+        this.Precio = Precio;
+    }
 }
 
 var listaModelos = [];
 var listaMarcas = [];
-var dictModelosCambiados = {} ;
+var listaModelosCambiados = [];
 var selectMarcas;
 var btnGuardar;
 function inicioPagina() {
@@ -21,12 +21,15 @@ function inicioPagina() {
     btnGuardar.addEventListener("click", guardaCambios, false);
     peticionMarcas();
 }
-const options = {
+const optionGet = {
     method: "GET"
 };
+const optionPut = {
+    method: "PUT"
+}
 
 function peticionMarcas() {
-    fetch("https://marcasycochespaco.azurewebsites.net/api/marcas", options)
+    fetch("https://marcasycochespaco.azurewebsites.net/api/marcas", optionGet)
         .then(response => {
             if (response.ok) { //Si la petición es correcta
                 return response.json(); //Parseamos los datos a json
@@ -37,13 +40,13 @@ function peticionMarcas() {
                 var opt = document.createElement("option");
                 opt.value = listaMarcas[i].id; //El value de cada opcion será el id de la marca
                 opt.innerHTML = listaMarcas[i].nombre; //El texto de cada opcion será el nombre de la marca
-                selectMarcas.appendChild(opt); 
+                selectMarcas.appendChild(opt);
             }
             peticionModelos();
         });
 }
 function peticionModelos() {
-    fetch("https://marcasycochespaco.azurewebsites.net/api/modelos", options)
+    fetch("https://marcasycochespaco.azurewebsites.net/api/modelos", optionGet)
         .then(response => {
             if (response.ok) { //Si la petición es correcta
                 return response.json(); //Parseamos los datos a json
@@ -53,7 +56,8 @@ function peticionModelos() {
         });
 }
 function tablaModelos() {
-    tablaExistente = document.getElementById("coches")
+    tablaExistente = document.getElementById("coches");
+    let tablaHTML = document.getElementById("tablaModelos");
     if (tablaExistente) {  //Seleccionamos la tabla (si existe)) 
         document.body.removeChild(tablaExistente) //Eliminamos toda la tabla
     }
@@ -78,38 +82,51 @@ function tablaModelos() {
                 celdaPrecio.appendChild(input);
             }
         });
-        document.body.appendChild(tabla); //Añadimos la tabla creada a la página como hija del elemento 'body'
+        tablaHTML.appendChild(tabla); //Añadimos la tabla creada a la página como hija del elemento 'body'
     }
 }
 
 function precioCambiado(precioAnterior) {
     return function (event) {
+        let precioIntroducidoMal = document.getElementById("preciomal");
         let modeloAlterado = event.target;
         let precioNuevo = modeloAlterado.value;
-        let indexModeloAlterado = listaModelosCambiados.indexOf(modeloAlterado.name)
+        let indexModeloAlterado = listaModelosCambiados.findIndex(modelo => modelo.Id === modeloAlterado.name);
 
         if (precioAnterior < precioNuevo) {
             if (indexModeloAlterado == -1) { //Si el elemento no está en la lista
-                dictModelosCambiados.modeloAlterado.name = precioNuevo;
+                let m = new DTOModelo(precioNuevo, modeloAlterado.name)
+                listaModelosCambiados.push(m)
             }
         } else {
             if (indexModeloAlterado >= 0) {
                 listaModelosCambiados.splice(indexModeloAlterado)
             }
-            console.log("El precio debe ser mayor que el previo")
+            modeloAlterado.value = precioAnterior;
+            precioIntroducidoMal.style.color = "red";
+            precioIntroducidoMal.innerHTML = "El precio debe ser mayor que el previo";
         }
-        console.log("Valores del array:" + listaModelosCambiados)
     }
 }
 
 function guardaCambios() {
     let textoRes = document.getElementById("resultado");
     if (listaModelosCambiados.length == 0) {
-        textoRes.innerHTML = "Me pica el culo";
+        textoRes.innerHTML = "No se ha alterado ningún precio correctamente";
     } else {
         textoRes.innerHTML = "";
-        listaModelosCambiados.forEach((modelo) => {
-            let modelo = new DTOModelo(modelo.id)
+        fetch("https://marcasycochespaco.azurewebsites.net/api/modelos", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(listaModelosCambiados),
+        }).then(response => {
+            if (response.ok) { //Si la petición es correcta
+                return response.json(); //Parseamos los datos a json
+            }
+        }).then(data => {
+            textoRes.innerHTML = "Se ha(n) alterado " + data + " precio(s)";  //Guardamos los datos en formato json en la tabla
         });
     }
 }

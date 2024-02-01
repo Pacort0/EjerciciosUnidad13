@@ -1,5 +1,4 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
@@ -7,12 +6,19 @@
     <title></title>
 </head>
 <body>
-    <label for="marcas">Escoge una marca</label>
+    <div id="selectMarcas">
+        <label for="marcas">Escoge una marca</label>
+        <select name="marcas" id="marcas">
+            <option value="elige" selected>Elige una marca</option>
+        </select>
+        <input type="button" id="btnGuardar" value="Guardar" />
+        <label id="resultado"></label>
+    </div>
+    <div id="tablaModelos">
 
-    <select name="marcas" id="marcas">
-        <option value="elige" selected>Elige una marca</option>
-    </select>
-    <input type="button" id="btnGuardar" value="Guardar" />
-    <label id="resultado"></label>
+    </div>
+    <div>
+        <label id="preciomal"></label>
+    </div>
 </body>
 </html>
