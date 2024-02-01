@@ -57,9 +57,9 @@ function peticionModelos() {
 }
 function tablaModelos() {
     tablaExistente = document.getElementById("coches");
-    let tablaHTML = document.getElementById("tablaModelos");
+    let div = document.getElementById("tablaModelos")
     if (tablaExistente) {  //Seleccionamos la tabla (si existe)) 
-        document.body.removeChild(tablaExistente) //Eliminamos toda la tabla
+        div.removeChild(tablaExistente) //Eliminamos toda la tabla
     }
 
     var marca = document.getElementById("marcas").value; //Cogemos el id de la marca escogida por el usuario
@@ -82,7 +82,7 @@ function tablaModelos() {
                 celdaPrecio.appendChild(input);
             }
         });
-        tablaHTML.appendChild(tabla); //Añadimos la tabla creada a la página como hija del elemento 'body'
+        div.appendChild(tabla); //Añadimos la tabla creada a la página como hija del elemento 'body'
     }
 }
 
@@ -127,7 +127,7 @@ function guardaCambios() {
                 return response.json(); //Parseamos los datos a json
             }
         }).then(data => {
-            textoRes.innerHTML = "Se ha(n) alterado " + data + " precio(s)";  //Guardamos los datos en formato json en la tabla
+            textoRes.innerHTML = "Se ha(n) alterado " + listaModelosCambiados.length + " precio(s)";  //Guardamos los datos en formato json en la tabla
             precioIntroducidoMal.innerHTML = "";
         });
     }
