@@ -96,7 +96,8 @@ function precioCambiado(precioAnterior) {
         if (precioAnterior < precioNuevo) {
             if (indexModeloAlterado == -1) { //Si el elemento no está en la lista
                 let m = new DTOModelo(precioNuevo, modeloAlterado.name)
-                listaModelosCambiados.push(m)
+                listaModelosCambiados.push(m);
+                precioIntroducidoMal.innerHTML = "";
             }
         } else {
             if (indexModeloAlterado >= 0) {
@@ -127,6 +128,7 @@ function guardaCambios() {
             }
         }).then(data => {
             textoRes.innerHTML = "Se ha(n) alterado " + data + " precio(s)";  //Guardamos los datos en formato json en la tabla
+            precioIntroducidoMal.innerHTML = "";
         });
     }
 }
