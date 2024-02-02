@@ -14,6 +14,7 @@ var listaMarcas = [];
 var listaModelosCambiados = [];
 var selectMarcas;
 var btnGuardar;
+
 function inicioPagina() {
     selectMarcas = document.getElementById("marcas");
     btnGuardar = document.getElementById("btnGuardar");

@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <script src="script07.js"></script>
+    <title>CRUD API AJAX</title>
+</head>
+<body>
+    <h1>IES Nervión</h1>
+    <section class="crud">
+        <article>
+            <h2 class="titulo">Insertar</h2>
+            <form class="formulario">
+                <label for="nombre">Nombre</label>
+                <br />
+                <input type="text" id="nombre" placeholder="Nombre" required />
+                <br />
+                <label for="apellidos">Apellidos</label>
+                <br />
+                <input type="text" id="apellidos" placeholder="Apellidos" required />
+                <br />
+                <label for="fechaNac">Fecha de nacimiento</label>
+                <br />
+                <input type="date" id="fechaNac" placeholder="Fecha de nacimiento" required />
+                <br />
+                <label for="direccion">Direccion</label>
+                <br />
+                <input type="text" id="direccion" placeholder="Dirección" required />
+                <br />
+                <label for="foto">Foto</label>
+                <br />
+                <input type="text" id="foto" placeholder="Url de imagen" required />
+                <br />
+                <label for="numTelf">Número de teléfono</label>
+                <br />
+                <input type="tel" id="numTelf" placeholder="Núm. de teléfono" required />
+                <br />
+                <input type="button" value="Enviar" />
+            </form>
+        </article>
+        <article>
+            <h2>Ver alumnos</h2>
+            <table id="tablaAlumnos">
+            </table>
+        </article>
+    </section>
+</body>
+</html>
