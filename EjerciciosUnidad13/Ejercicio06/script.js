@@ -130,5 +130,6 @@ function guardaCambios() {
             textoRes.innerHTML = "Se ha(n) alterado " + listaModelosCambiados.length + " precio(s)";  //Guardamos los datos en formato json en la tabla
             precioIntroducidoMal.innerHTML = "";
         });
+        peticionModelos(); //Actualizamos la tabla de modelos
     }
 }
