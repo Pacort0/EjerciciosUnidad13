@@ -4,46 +4,22 @@
 <head>
     <meta charset="utf-8" />
     <script src="script07.js"></script>
+    <link rel="stylesheet" type="text/css" href="style07.css"> <!-- Link to the external CSS file -->
     <title>CRUD API AJAX</title>
 </head>
 <body>
-    <h1>IES Nervión</h1>
+    <div id="titulo">
+        <h1 id="pagina" value="1">IES Nervión</h1>
+        <div id="botones">
+            <button id="btnPersonas">Personas</button>
+            <button id="btnDepartamentos">Departamentos</button>
+        </div>
+    </div>
     <section class="crud">
         <article id="espacioFormulario">
             <h2 id="tipoAccion">Insertar</h2>
             <label id="idEdit"></label>
-            <form class="formulario">
-                <label for="inputNombre">Nombre</label>
-                <br />
-                <input type="text" id="inputNombre" placeholder="Nombre" required />
-                <br />
-                <label for="inputApellidos">Apellidos</label>
-                <br />
-                <input type="text" id="inputApellidos" placeholder="Apellidos" required />
-                <br />
-                <label for="inputFechaNac">Fecha de nacimiento</label>
-                <br />
-                <input type="date" id="inputFechaNac" placeholder="Fecha de nacimiento" required />
-                <br />
-                <label for="inputDireccion">Direccion</label>
-                <br />
-                <input type="text" id="inputDireccion" placeholder="Dirección" required />
-                <br />
-                <label for="inputNumTelf">Número de teléfono</label>
-                <br />
-                <input type="tel" id="inputNumTelf" placeholder="Núm. de teléfono" required />
-                <br />
-                <label for="inputFoto">Foto</label>
-                <br />
-                <input type="text" id="inputFoto" placeholder="Url de imagen" required />
-                <br />
-                <label>Escoge un departamento</label>
-                <div id="divSelectDepartamentos">
-                    <select name="tablaDepartamentos" id="selectDepartamentos">
-                        <option value="elige" selected>Elige un departamento</option>
-                    </select>
-                </div>
-                <input type="button" id="btnEnviar" value="Enviar" />
+            <form id="idFormulario" class="formulario"> 
             </form>
         </article>
         <article>

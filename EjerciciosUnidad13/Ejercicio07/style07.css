@@ -1,0 +1,12 @@
+﻿#titulo {
+    display: flex;
+    align-items: center;
+}
+
+#botones {
+    margin-left: 10px; /* Pushes the buttons to the right */
+}
+
+#botones button {
+    margin-left: 10px; /* Adds space between buttons */
+}
