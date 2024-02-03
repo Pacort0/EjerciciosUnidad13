@@ -9,38 +9,44 @@
 <body>
     <h1>IES Nervión</h1>
     <section class="crud">
-        <article>
-            <h2 class="titulo">Insertar</h2>
+        <article id="espacioFormulario">
+            <h2 id="tipoAccion">Insertar</h2>
             <form class="formulario">
-                <label for="nombre">Nombre</label>
+                <label for="inputNombre">Nombre</label>
                 <br />
-                <input type="text" id="nombre" placeholder="Nombre" required />
+                <input type="text" id="inputNombre" placeholder="Nombre" required />
                 <br />
-                <label for="apellidos">Apellidos</label>
+                <label for="inputApellidos">Apellidos</label>
                 <br />
-                <input type="text" id="apellidos" placeholder="Apellidos" required />
+                <input type="text" id="inputApellidos" placeholder="Apellidos" required />
                 <br />
-                <label for="fechaNac">Fecha de nacimiento</label>
+                <label for="inputFechaNac">Fecha de nacimiento</label>
                 <br />
-                <input type="date" id="fechaNac" placeholder="Fecha de nacimiento" required />
+                <input type="date" id="inputFechaNac" placeholder="Fecha de nacimiento" required />
                 <br />
-                <label for="direccion">Direccion</label>
+                <label for="inputDireccion">Direccion</label>
                 <br />
-                <input type="text" id="direccion" placeholder="Dirección" required />
+                <input type="text" id="inputDireccion" placeholder="Dirección" required />
                 <br />
-                <label for="foto">Foto</label>
+                <label for="inputNumTelf">Número de teléfono</label>
                 <br />
-                <input type="text" id="foto" placeholder="Url de imagen" required />
+                <input type="tel" id="inputNumTelf" placeholder="Núm. de teléfono" required />
                 <br />
-                <label for="numTelf">Número de teléfono</label>
+                <label for="inputFoto">Foto</label>
                 <br />
-                <input type="tel" id="numTelf" placeholder="Núm. de teléfono" required />
+                <input type="text" id="inputFoto" placeholder="Url de imagen" required />
                 <br />
-                <input type="button" value="Enviar" />
+                <label>Escoge un departamento</label>
+                <div id="divSelectDepartamentos">
+                    <select name="tablaDepartamentos" id="selectDepartamentos">
+                        <option value="elige" selected>Elige un departamento</option>
+                    </select>
+                </div>
+                <input type="button" id="btnEnviar" value="Enviar" />
             </form>
         </article>
         <article>
-            <h2>Ver alumnos</h2>
+            <h2>Lista de alumnos</h2>
             <table id="tablaAlumnos">
             </table>
         </article>
