@@ -1,8 +1,8 @@
 ﻿window.onload = inicioPagina;
 
 class clsPersona {
-    constructor(nombre, apellidos, direccion, fechaNac, telefono, imageURL, idDepartamento) {
-        this.id = -1;
+    constructor(id, nombre, apellidos, direccion, fechaNac, telefono, imageURL, idDepartamento) {
+        this.id = id;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.direccion = direccion;
@@ -11,33 +11,44 @@ class clsPersona {
         this.imageURL = imageURL;
         this.idDepartamento = idDepartamento;
     }
+
 }
 
-var listaAlumnos = [];
+var listaPersonasHTML = [];
 var listaDepartamentos = [];
 var btnEnviar;
 var accion;
 var espacioForm;
+var listaPersonas = [];
+var idEdit;
+
+//Cuando se carga la página, se llama a esta función
 function inicioPagina() {
-    listaAlumnos = document.getElementById("tablaAlumnos");
+    listaPersonasHTML = document.getElementById("tablaAlumnos");
     listaDepartamentos = document.getElementById("selectDepartamentos")
     btnEnviar = document.getElementById("btnEnviar").addEventListener("click", ejecutaAccion, false);
     accion = document.getElementById("tipoAccion");
     espacioForm = document.getElementById("espacioFormulario");
+    idEdit = document.getElementById("idEdit");
     peticionDepartamentos();
 
+    //'Toasts' tras realizar algún tipo de cambio en la tabla de alumnos
     if (localStorage.getItem('personaEliminadaFlag') == 'true') {
         showToast("Persona eliminada correctamente");
         localStorage.removeItem('personaEliminadaFlag');
     } else if (localStorage.getItem("personaAgregadaFlag") == 'true') {
         showToast("Persona agregada correctamente");
-        localStorage.removeItem('personaEliminadaFlag');
+        localStorage.removeItem('personaAgregadaFlag');
+    } else if (localStorage.getItem("personaEditadaFlag") == "true") {
+        showToast("Persona editada correctamente");
+        localStorage.removeItem('personaEditadaFlag');
     }
 }
 
 const optionGet = {
     method: "GET"
 };
+//Función que recoge una lista de departamentos de la api y rellena el select de departamentos
 function peticionDepartamentos() {
     fetch("https://crudpaco.azurewebsites.net/api/departamentos", optionGet)
         .then(response => {
@@ -56,64 +67,123 @@ function peticionDepartamentos() {
         });
 }
 
+//Función que recoge una lista de persona de la api y rellena una tabla de personas con nombre de departamento
 function peticionPersonas() {
-    var apiEntera = [];
-    fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
+     fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
         .then(response => {
             if (response.ok) {
                 return response.json();
             }
         })
         .then(data => {
-            apiEntera = data;
+            listaPersonas = data;
 
-            for (let i = 0; i < apiEntera.length; i++) {
+            for (let i = 0; i < listaPersonas.length; i++) {
+                //Para hacer la búsqueda de departamento
                 let contadorDepartamentos = 0;
                 let encontrado = false;
+                //Creamos los elementos necesarios de la lista por persona
                 var tr = document.createElement("tr");
                 var tdNombre = document.createElement("td");
                 var tdApellidos = document.createElement("td");
                 var tdDepartamento = document.createElement("td");
                 var btnEditar = document.createElement("button");
                 var btnEliminar = document.createElement("button");
-                btnEditar.id = apiEntera[i].id;
+                //Damos propiedades a los botones de cada persona
+                btnEditar.id = listaPersonas[i].id;
                 btnEditar.textContent = "Editar";
-                btnEliminar.id = apiEntera[i].id;
+                btnEliminar.id = listaPersonas[i].id;
                 btnEliminar.textContent = "Eliminar";
                 btnEditar.addEventListener("click", editarPersona, false);
                 btnEliminar.addEventListener("click", eliminarPersona, false);
 
-                tdNombre.innerHTML = apiEntera[i].nombre;
-                tdApellidos.innerHTML = apiEntera[i].apellidos;
+                //Valor al nombre y apellidos de la persona
+                tdNombre.innerHTML = listaPersonas[i].nombre;
+                tdApellidos.innerHTML = listaPersonas[i].apellidos;
 
+                //Buscamos el departamento de la persona y ponemos el nombre en la tabla
                 while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
-                    if (listaDepartamentos[contadorDepartamentos].idDepartamento == apiEntera[i].idDepartamento) {
+                    if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
                         tdDepartamento.innerHTML = listaDepartamentos[contadorDepartamentos].nombreDepartamento;
                         encontrado = true;
                     }
                     contadorDepartamentos++;
                 };
 
+                //Metemos en la tabla los valores encontrados
                 tr.appendChild(tdNombre);
                 tr.appendChild(tdApellidos);
                 tr.appendChild(tdDepartamento);
                 tr.appendChild(btnEditar);
                 tr.appendChild(btnEliminar);
-                listaAlumnos.appendChild(tr);
+                listaPersonasHTML.appendChild(tr);
             }
         });
 }
+
+//Cuando se pulse el botón de 'Editar', se llama a esta función, que pasa los datos de la persona a editar al formulario
+function editarPersona(event) {
+    accion.innerHTML = "Editar";
+    const personaAEditar = event.target;
+    const datosPersona = listaPersonas.find(persona => persona.id == personaAEditar.id);
+    const fechaNacFormateada = datosPersona.fechaNac.substring(0, 10);
+    idEdit = personaAEditar.id;
+
+    document.getElementById("inputNombre").value = datosPersona.nombre;
+    document.getElementById("inputApellidos").value = datosPersona.apellidos;
+    document.getElementById("inputDireccion").value = datosPersona.direccion;
+    document.getElementById("inputFechaNac").value = fechaNacFormateada;
+    document.getElementById("inputFoto").value = datosPersona.imageURL;
+    document.getElementById("selectDepartamentos").value = datosPersona.idDepartamento;
+    document.getElementById("inputNumTelf").value = datosPersona.telefono;
+}
+//Cuando se quiera eliminar a una persona, se llama a esta función.
+//Se pregunta al usuario si está seguro de eliminar a dicha persona. En caso positivo, la eliminas
+function eliminarPersona(event) {
+    const personaAEliminar = event.target;
+    const idPersona = personaAEliminar.id;
+    const seguro = confirm("¿Estás seguro de eliminar a esta persona?\nEsta acción es irreversible.")
+    if (seguro) {
+        fetch(`https://crudpaco.azurewebsites.net/api/personas/${idPersona}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(response => {
+            if (response.ok) { //Si la petición es correcta
+                localStorage.setItem('personaEliminadaFlag', 'true');
+                location.reload();
+            }
+        });
+    }
+}
+
+//Función que muestra un mensaje temporal por pantalla
+function showToast(mensaje) {
+    var toast = document.createElement("label")
+    toast.innerHTML = mensaje.bold();
+    toast.style.fontSize = 30;
+
+    espacioForm.appendChild(toast);
+
+    setTimeout(() => {
+        espacioForm.removeChild(toast);
+    }, 5000);
+}
+
+//Función que se llama cuando se presiona el botón de Enviar.
+//Esta función comprueba si se trata de un post o de un put y actúa en consecuencia
 function ejecutaAccion() {
-    let nombre = document.getElementById("inputNombre").value;
-    let apellidos = document.getElementById("inputApellidos").value;
-    let fechaNac = document.getElementById("inputFechaNac").value + "T00:00:00"; //DateTime
-    let direccion = document.getElementById("inputDireccion").value;
-    let foto = document.getElementById("inputFoto").value;
-    let numTelf = document.getElementById("inputNumTelf").value;
-    let departamento = document.getElementById("selectDepartamentos").value;
+    const nombre = document.getElementById("inputNombre").value;
+    const apellidos = document.getElementById("inputApellidos").value;
+    const fechaNac = document.getElementById("inputFechaNac").value + "T00:00:00"; //DateTime
+    const direccion = document.getElementById("inputDireccion").value;
+    const foto = document.getElementById("inputFoto").value;
+    const numTelf = document.getElementById("inputNumTelf").value;
+    const departamento = document.getElementById("selectDepartamentos").value;
 
     if (accion.innerHTML == "Insertar") {
-        let persona = new clsPersona(nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+        const persona = new clsPersona(-1, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
         fetch("https://crudpaco.azurewebsites.net/api/personas", {
             method: "POST",
             headers: {
@@ -126,36 +196,19 @@ function ejecutaAccion() {
                 location.reload();
             }
         });
+    } else if (accion.innerHTML == "Editar") {
+        const persona = new clsPersona(idEdit, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+        fetch(`https://crudpaco.azurewebsites.net/api/personas/${idEdit}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(persona),
+        }).then(response => {
+            if (response.ok) { //Si la petición es correcta
+                localStorage.setItem('personaEditadaFlag', 'true');
+                location.reload();
+            }
+        });
     }
-}
-
-function editarPersona() {
-
-}
-function eliminarPersona(event) {
-    let personaAEliminar = event.target;
-    let idPersona = personaAEliminar.id;
-    fetch(`https://crudpaco.azurewebsites.net/api/personas/${idPersona}`, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
-        },
-    }).then(response => {
-        if (response.ok) { //Si la petición es correcta
-            localStorage.setItem('personaEliminadaFlag', 'true');
-            location.reload();
-        }
-    });
-}
-
-function showToast(mensaje) {
-    var toast = document.createElement("label")
-    toast.innerHTML = mensaje;
-    toast.style.fontSize = 30;
-
-    espacioForm.appendChild(toast);
-
-    setTimeout(() => {
-        espacioForm.removeChild(toast);
-    }, 5000);
 }
