@@ -1,5 +1,6 @@
 ﻿window.onload = inicioPagina;
 
+//clase persona
 class clsPersona {
     constructor(id, nombre, apellidos, direccion, fechaNac, telefono, imageURL, idDepartamento) {
         this.id = id;
@@ -12,7 +13,7 @@ class clsPersona {
         this.idDepartamento = idDepartamento;
     }
 }
-
+//clase departamento
 class clsDepartamento {
     constructor(idDepartamento, nombreDepartamento) {
         this.idDepartamento = idDepartamento;
@@ -20,100 +21,178 @@ class clsDepartamento {
     }
 }
 
-var listaPersonasHTML = [];
+var listaHTML = [];
 var listaDepartamentos = [];
-var btnEnviar;
 var accion;
 var espacioForm;
 var listaPersonas = [];
 var idEdit;
+var btnPersonas;
+var btnDepartamentos;
+var pagina;
 
 //Cuando se carga la página, se llama a esta función
 function inicioPagina() {
+    const tituloLista = document.getElementById("nombreLista");
+    var btnEnviar;
+    var btnCancelar;
+
+    if (localStorage.getItem('cambioPaginaDepartamentosFlag') == 'true') {
+        pagina = 2;
+        tituloLista.textContent = "Lista de departamentos";
+        localStorage.removeItem('cambioPaginaDepartamentosFlag');
+    } else if (localStorage.getItem('recargaDepartamentosFlag') == 'true') {
+        pagina = 2;
+        tituloLista.textContent = "Lista de departamentos";
+        localStorage.removeItem('recargaDepartamentosFlag');
+    } else if (localStorage.getItem('cambioPaginaPersonasFlag') == 'true') {
+        pagina = 1;
+        tituloLista.textContent = "Lista de personas";
+        localStorage.removeItem('cambioPaginaPersonasFlag');
+    } else {
+        pagina = 1; //Por defecto, la página es la de personas
+        tituloLista.textContent = "Lista de personas";
+    }
+
     creaFormulario();
-    listaPersonasHTML = document.getElementById("tablaAlumnos");
+    listaHTML = document.getElementById("lista");
     listaDepartamentos = document.getElementById("selectDepartamentos")
     btnEnviar = document.getElementById("btnEnviar").addEventListener("click", ejecutaAccion, false);
+    btnCancelar = document.getElementById("btnCancelar").addEventListener("click", cancelarAccion, false);
+    btnPersonas = document.getElementById("btnPersonas").addEventListener("click", cambiaPagina, false);
+    btnDepartamentos = document.getElementById("btnDepartamentos").addEventListener("click", cambiaPagina, false);
     accion = document.getElementById("tipoAccion");
     espacioForm = document.getElementById("espacioFormulario");
     idEdit = document.getElementById("idEdit");
     peticionDepartamentos();
 
-    //'Toasts' tras realizar algún tipo de cambio en la tabla de alumnos
-    if (localStorage.getItem('personaEliminadaFlag') == 'true') {
-        showToast("Persona eliminada correctamente");
-        localStorage.removeItem('personaEliminadaFlag');
-    } else if (localStorage.getItem("personaAgregadaFlag") == 'true') {
-        showToast("Persona agregada correctamente");
-        localStorage.removeItem('personaAgregadaFlag');
-    } else if (localStorage.getItem("personaEditadaFlag") == "true") {
-        showToast("Persona editada correctamente");
-        localStorage.removeItem('personaEditadaFlag');
+    //'Toasts' tras realizar algún tipo de cambio en las listas
+    if (pagina == 1) {
+        if (localStorage.getItem('personaEliminadaFlag') == 'true') {
+            showToast("Persona eliminada correctamente");
+            localStorage.removeItem('personaEliminadaFlag');
+        } else if (localStorage.getItem("personaAgregadaFlag") == 'true') {
+            showToast("Persona agregada correctamente");
+            localStorage.removeItem('personaAgregadaFlag');
+        } else if (localStorage.getItem("personaEditadaFlag") == "true") {
+            showToast("Persona editada correctamente");
+            localStorage.removeItem('personaEditadaFlag');
+        }
+    } else if (pagina == 2) {
+        if (localStorage.getItem('departamentoEliminadoFlag') == 'true') {
+            showToast("Departamento eliminado correctamente");
+            localStorage.removeItem('departamentoEliminadoFlag');
+        } else if (localStorage.getItem("departamentoAgregadoFlag") == 'true') {
+            showToast("Departamento agregado correctamente");
+            localStorage.removeItem('departamentoAgregadoFlag');
+        } else if (localStorage.getItem("departamentoEditadoFlag") == "true") {
+            showToast("Departamento editado correctamente");
+            localStorage.removeItem('departamentoEditadoFlag');
+        }
     }
+
 }
 
 function creaFormulario() {
     //Tomamos el formulario de la pagina HTML
     var formulario = document.getElementById("idFormulario");
 
-    // Elementos del formulario
-    var elements = [
-        { label: "Nombre", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
-        { label: "Apellidos", type: "text", id: "inputApellidos", placeholder: "Apellidos", required: true },
-        { label: "Fecha de nacimiento", type: "date", id: "inputFechaNac", placeholder: "Fecha de nacimiento", required: true },
-        { label: "Direccion", type: "text", id: "inputDireccion", placeholder: "Dirección", required: true },
-        { label: "Número de teléfono", type: "tel", id: "inputNumTelf", placeholder: "Núm. de teléfono", required: true },
-        { label: "Foto", type: "text", id: "inputFoto", placeholder: "Url de imagen", required: true },
-    ];
+    if (pagina == 1) {
+        // Elementos del formulario
+        var elementos = [
+            { label: "Nombre", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
+            { label: "Apellidos", type: "text", id: "inputApellidos", placeholder: "Apellidos", required: true },
+            { label: "Fecha de nacimiento", type: "date", id: "inputFechaNac", placeholder: "Fecha de nacimiento", required: true },
+            { label: "Direccion", type: "text", id: "inputDireccion", placeholder: "Dirección", required: true },
+            { label: "Número de teléfono", type: "tel", id: "inputNumTelf", placeholder: "Núm. de teléfono", required: true },
+            { label: "Foto", type: "text", id: "inputFoto", placeholder: "Url de imagen", required: true },
+        ];
 
-    // Creamos cada label y cada input del form linea a linea
-    elements.forEach(function (elementInfo) {
-        var label = document.createElement("label");
-        label.htmlFor = elementInfo.id;
-        label.textContent = elementInfo.label;
-        formulario.appendChild(label);
+        // Creamos cada label y cada input del form linea a linea
+        elementos.forEach(function (elemento) {
+            var label = document.createElement("label");
+            label.htmlFor = elemento.id;
+            label.textContent = elemento.label;
+            formulario.appendChild(label);
 
-        formulario.appendChild(document.createElement("br"));
+            formulario.appendChild(document.createElement("br"));
 
-        var input = document.createElement("input");
-        input.type = elementInfo.type;
-        input.id = elementInfo.id;
-        input.placeholder = elementInfo.placeholder;
-        if (elementInfo.required) {
-            input.required = true;
-        }
-        formulario.appendChild(input);
+            var input = document.createElement("input");
+            input.type = elemento.type;
+            input.id = elemento.id;
+            input.placeholder = elemento.placeholder;
+            if (elemento.required) {
+                input.required = true;
+            }
+            formulario.appendChild(input);
 
-        formulario.appendChild(document.createElement("br"));
-    });
+            formulario.appendChild(document.createElement("br"));
+        });
 
-    // Añadimos el select de departamentos
-    const departmentLabel = document.createElement("label");
-    departmentLabel.textContent = "Escoge un departamento";
-    formulario.appendChild(departmentLabel);
+        // Añadimos el select de departamentos
+        const labelDept = document.createElement("label");
+        labelDept.textContent = "Escoge un departamento";
+        formulario.appendChild(labelDept);
 
-    //Si no pongo un div me da error el botón de submit
-    const departmentDiv = document.createElement("div");
-    departmentDiv.id = "divSelectDepartamentos";
-    const departmentSelect = document.createElement("select");
-    departmentSelect.name = "tablaDepartamentos";
-    departmentSelect.id = "selectDepartamentos";
+        //Si no pongo un div me da error el botón de submit
+        const divDept = document.createElement("div");
+        divDept.id = "divSelectDepartamentos";
 
-    //Opción por defecto
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "elige";
-    defaultOption.selected = true;
-    defaultOption.textContent = "Elige un departamento";
-    departmentSelect.appendChild(defaultOption);
+        const departmentSelect = document.createElement("select");
+        departmentSelect.name = "tablaDepartamentos";
+        departmentSelect.id = "selectDepartamentos";
 
-    departmentDiv.appendChild(departmentSelect);
-    formulario.appendChild(departmentDiv);
+        //Opción por defecto
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "elige";
+        defaultOption.selected = true;
+        defaultOption.textContent = "Elige un departamento";
+        departmentSelect.appendChild(defaultOption);
+
+        divDept.appendChild(departmentSelect);
+        formulario.appendChild(divDept);
+    } else if (pagina == 2) { //Si la pagina es la de los departamentos
+        var elementos = [
+            { label: "Nombre del departamento", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
+        ];
+
+        // Creamos cada label y cada input del form linea a linea
+        elementos.forEach(function (elementInfo) {
+            var label = document.createElement("label");
+            label.htmlFor = elementInfo.id;
+            label.textContent = elementInfo.label;
+            formulario.appendChild(label);
+
+            formulario.appendChild(document.createElement("br"));
+
+            var input = document.createElement("input");
+            input.type = elementInfo.type;
+            input.id = elementInfo.id;
+            input.placeholder = elementInfo.placeholder;
+            if (elementInfo.required) {
+                input.required = true;
+            }
+            formulario.appendChild(input);
+
+            formulario.appendChild(document.createElement("br"));
+        });
+    }
+    const botonesDiv = document.createElement("div");
+    botonesDiv.id = "botonesFormulario";
 
     const btnEnviar = document.createElement("input");
     btnEnviar.type = "button";
     btnEnviar.id = "btnEnviar";
     btnEnviar.value = "Enviar";
-    formulario.appendChild(btnEnviar);
+    botonesDiv.appendChild(btnEnviar);
+
+    const btnCancelar = document.createElement("input");
+    btnCancelar.type = "button";
+    btnCancelar.id = "btnCancelar";
+    btnCancelar.value = "Cancelar";
+    botonesDiv.appendChild(btnCancelar);
+
+    formulario.appendChild(botonesDiv);
 }
 
 
@@ -129,94 +208,148 @@ function peticionDepartamentos() {
             }
         }).then(data => {
             listaDepartamentos = data;  //Guardamos los datos en formato json en la tabla
-            for (let i = 0; i < listaDepartamentos.length; i++) { //Creamos las opciones del select
-                var opt = document.createElement("option");
-                opt.value = listaDepartamentos[i].idDepartamento; //El value de cada opcion será el id del departmento
-                opt.innerHTML = listaDepartamentos[i].nombreDepartamento; //El texto de cada opcion será el nombre del departento
-                selectDepartamentos.appendChild(opt);
+            if (pagina == 1) {
+                for (let i = 0; i < listaDepartamentos.length; i++) { //Creamos las opciones del select
+                    if (listaDepartamentos[i].idDepartamento != 5) {
+                        var opt = document.createElement("option");
+                        opt.value = listaDepartamentos[i].idDepartamento; //El value de cada opcion será el id del departmento
+                        opt.innerHTML = listaDepartamentos[i].nombreDepartamento; //El texto de cada opcion será el nombre del departento
+                        selectDepartamentos.appendChild(opt);
+                    }
+                }
+                peticionPersonas(); //Llamamos a la funcion cuando ya se ha completado el proceso de la lista de departamentos
+            } else if (pagina == 2) {
+                for (let i = 0; i < listaDepartamentos.length; i++) {
+                    if (listaDepartamentos[i].idDepartamento != 5) { //Es el departamento por defecto
+                        //Creamos los elementos necesarios de la lista por persona
+                        var tr = document.createElement("tr");
+                        var tdNombre = document.createElement("td");
+                        var btnEditar = document.createElement("button");
+                        var btnEliminar = document.createElement("button");
+                        //Damos propiedades a los botones de cada persona
+                        btnEditar.id = listaDepartamentos[i].idDepartamento;
+                        btnEditar.textContent = "Editar";
+                        btnEliminar.id = listaDepartamentos[i].idDepartamento;
+                        btnEliminar.textContent = "Eliminar";
+                        btnEditar.addEventListener("click", editar, false);
+                        btnEliminar.addEventListener("click", eliminar, false);
+
+                        //Valor al nombre y apellidos de la persona
+                        tdNombre.innerHTML = listaDepartamentos[i].nombreDepartamento;
+
+                        //Metemos en la tabla los valores encontrados
+                        tr.appendChild(tdNombre);
+                        tr.appendChild(btnEditar);
+                        tr.appendChild(btnEliminar);
+                        listaHTML.appendChild(tr);
+                    }
+                }
             }
-            peticionPersonas(); //Llamamos a la funcion cuando ya se ha completado el proceso de la lista de departamentos
         });
 }
 
 //Función que recoge una lista de persona de la api y rellena una tabla de personas con nombre de departamento
 function peticionPersonas() {
-    fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(data => {
-            listaPersonas = data;
+    if (pagina == 1) { //Solo se entra si la pagina es la pagina es la 1
+        fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                listaPersonas = data;
 
-            for (let i = 0; i < listaPersonas.length; i++) {
-                //Para hacer la búsqueda de departamento
-                let contadorDepartamentos = 0;
-                let encontrado = false;
-                //Creamos los elementos necesarios de la lista por persona
-                var tr = document.createElement("tr");
-                var tdNombre = document.createElement("td");
-                var tdApellidos = document.createElement("td");
-                var tdDepartamento = document.createElement("td");
-                var btnEditar = document.createElement("button");
-                var btnEliminar = document.createElement("button");
-                //Damos propiedades a los botones de cada persona
-                btnEditar.id = listaPersonas[i].id;
-                btnEditar.textContent = "Editar";
-                btnEliminar.id = listaPersonas[i].id;
-                btnEliminar.textContent = "Eliminar";
-                btnEditar.addEventListener("click", editarPersona, false);
-                btnEliminar.addEventListener("click", eliminarPersona, false);
+                for (let i = 0; i < listaPersonas.length; i++) {
+                    //Para hacer la búsqueda de departamento
+                    let contadorDepartamentos = 0;
+                    let encontrado = false;
+                    //Creamos los elementos necesarios de la lista por persona
+                    var tr = document.createElement("tr");
+                    var tdNombre = document.createElement("td");
+                    var tdApellidos = document.createElement("td");
+                    var tdDepartamento = document.createElement("td");
+                    var btnEditar = document.createElement("button");
+                    var btnEliminar = document.createElement("button");
+                    //Damos propiedades a los botones de cada persona
+                    btnEditar.id = listaPersonas[i].id;
+                    btnEditar.textContent = "Editar";
+                    btnEliminar.id = listaPersonas[i].id;
+                    btnEliminar.textContent = "Eliminar";
+                    btnEditar.addEventListener("click", editar, false);
+                    btnEliminar.addEventListener("click", eliminar, false);
 
-                //Valor al nombre y apellidos de la persona
-                tdNombre.innerHTML = listaPersonas[i].nombre;
-                tdApellidos.innerHTML = listaPersonas[i].apellidos;
+                    //Valor al nombre y apellidos de la persona
+                    tdNombre.innerHTML = listaPersonas[i].nombre;
+                    tdApellidos.innerHTML = listaPersonas[i].apellidos;
 
-                //Buscamos el departamento de la persona y ponemos el nombre en la tabla
-                while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
-                    if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
-                        tdDepartamento.innerHTML = listaDepartamentos[contadorDepartamentos].nombreDepartamento;
-                        encontrado = true;
+                    //Buscamos el departamento de la persona y ponemos el nombre en la tabla
+                    while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
+                        if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
+                            tdDepartamento.innerHTML = listaDepartamentos[contadorDepartamentos].nombreDepartamento;
+                            encontrado = true;
+                        }
+                        contadorDepartamentos++;
+                    } 
+
+                    if (encontrado == false) {
+                        tdDepartamento.innerHTML = "Departamento N/A";
                     }
-                    contadorDepartamentos++;
-                };
 
-                //Metemos en la tabla los valores encontrados
-                tr.appendChild(tdNombre);
-                tr.appendChild(tdApellidos);
-                tr.appendChild(tdDepartamento);
-                tr.appendChild(btnEditar);
-                tr.appendChild(btnEliminar);
-                listaPersonasHTML.appendChild(tr);
-            }
-        });
+                    //Metemos en la tabla los valores encontrados
+                    tr.appendChild(tdNombre);
+                    tr.appendChild(tdApellidos);
+                    tr.appendChild(tdDepartamento);
+                    tr.appendChild(btnEditar);
+                    tr.appendChild(btnEliminar);
+                    listaHTML.appendChild(tr);
+                }
+            });
+    }
 }
+
 
 //Cuando se pulse el botón de 'Editar', se llama a esta función, que pasa los datos de la persona a editar al formulario
-function editarPersona(event) {
+function editar(event) {
     accion.innerHTML = "Editar";
-    const personaAEditar = event.target;
-    const datosPersona = listaPersonas.find(persona => persona.id == personaAEditar.id);
-    const fechaNacFormateada = datosPersona.fechaNac.substring(0, 10);
-    idEdit = personaAEditar.id;
+    const elementoAEditar = event.target;
 
-    document.getElementById("inputNombre").value = datosPersona.nombre;
-    document.getElementById("inputApellidos").value = datosPersona.apellidos;
-    document.getElementById("inputDireccion").value = datosPersona.direccion;
-    document.getElementById("inputFechaNac").value = fechaNacFormateada;
-    document.getElementById("inputFoto").value = datosPersona.imageURL;
-    document.getElementById("selectDepartamentos").value = datosPersona.idDepartamento;
-    document.getElementById("inputNumTelf").value = datosPersona.telefono;
+    if (pagina == 1) {
+
+        const datosPersona = listaPersonas.find(persona => persona.id == elementoAEditar.id);
+        const fechaNacFormateada = datosPersona.fechaNac.substring(0, 10);
+        idEdit = elementoAEditar.id;
+
+        document.getElementById("inputNombre").value = datosPersona.nombre;
+        document.getElementById("inputApellidos").value = datosPersona.apellidos;
+        document.getElementById("inputDireccion").value = datosPersona.direccion;
+        document.getElementById("inputFechaNac").value = fechaNacFormateada;
+        document.getElementById("inputFoto").value = datosPersona.imageURL;
+        if (datosPersona.idDepartamento == 5) {
+            document.getElementById("selectDepartamentos").value = "elige";
+        } else {
+            document.getElementById("selectDepartamentos").value = datosPersona.idDepartamento;
+        }
+        document.getElementById("inputNumTelf").value = datosPersona.telefono;
+    } else if (pagina == 2) {
+
+        const datosDepartamento = listaDepartamentos.find(departamento => departamento.idDepartamento == elementoAEditar.id);
+        idEdit = elementoAEditar.id;
+
+        document.getElementById("inputNombre").value = datosDepartamento.nombreDepartamento;
+    }
+
 }
+
 //Cuando se quiera eliminar a una persona, se llama a esta función.
 //Se pregunta al usuario si está seguro de eliminar a dicha persona. En caso positivo, la eliminas
-function eliminarPersona(event) {
-    const personaAEliminar = event.target;
-    const idPersona = personaAEliminar.id;
-    const seguro = confirm("¿Estás seguro de eliminar a esta persona?\nEsta acción es irreversible.")
-    if (seguro) {
-        fetch(`https://crudpaco.azurewebsites.net/api/personas/${idPersona}`, {
+function eliminar(event) {
+    const elementoAEliminar = event.target;
+    const idElemento = elementoAEliminar.id;
+    const seguro = confirm("¿Estás seguro de eliminar este elemento?\nEsta acción es irreversible.")
+
+    if (seguro && pagina == 1) {
+        fetch(`https://crudpaco.azurewebsites.net/api/personas/${idElemento}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json"
@@ -224,6 +357,19 @@ function eliminarPersona(event) {
         }).then(response => {
             if (response.ok) { //Si la petición es correcta
                 localStorage.setItem('personaEliminadaFlag', 'true');
+                location.reload();
+            }
+        });
+    } else if (seguro && pagina == 2) {
+        fetch(`https://crudpaco.azurewebsites.net/api/departamentos/${idElemento}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then(response => {
+            if (response.ok) { //Si la petición es correcta
+                localStorage.setItem('departamentoEliminadoFlag', 'true');
+                localStorage.setItem('recargaDepartamentosFlag', 'true');   
                 location.reload();
             }
         });
@@ -247,40 +393,98 @@ function showToast(mensaje) {
 //Esta función comprueba si se trata de un post o de un put y actúa en consecuencia
 function ejecutaAccion() {
     const nombre = document.getElementById("inputNombre").value;
-    const apellidos = document.getElementById("inputApellidos").value;
-    const fechaNac = document.getElementById("inputFechaNac").value + "T00:00:00"; //DateTime
-    const direccion = document.getElementById("inputDireccion").value;
-    const foto = document.getElementById("inputFoto").value;
-    const numTelf = document.getElementById("inputNumTelf").value;
-    const departamento = document.getElementById("selectDepartamentos").value;
+    if (pagina == 1) {
+        const apellidos = document.getElementById("inputApellidos").value;
+        const fechaNac = document.getElementById("inputFechaNac").value + "T00:00:00"; //DateTime
+        const direccion = document.getElementById("inputDireccion").value;
+        const foto = document.getElementById("inputFoto").value;
+        const numTelf = document.getElementById("inputNumTelf").value;
+        const departamento = document.getElementById("selectDepartamentos").value;
 
-    if (accion.innerHTML == "Insertar") {
-        const persona = new clsPersona(-1, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
-        fetch("https://crudpaco.azurewebsites.net/api/personas", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(persona),
-        }).then(response => {
-            if (response.ok) { //Si la petición es correcta
-                localStorage.setItem('personaAgregadaFlag', 'true');
-                location.reload();
-            }
-        });
-    } else if (accion.innerHTML == "Editar") {
-        const persona = new clsPersona(idEdit, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
-        fetch(`https://crudpaco.azurewebsites.net/api/personas/${idEdit}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(persona),
-        }).then(response => {
-            if (response.ok) { //Si la petición es correcta
-                localStorage.setItem('personaEditadaFlag', 'true');
-                location.reload();
-            }
-        });
+        if (accion.innerHTML == "Insertar") {
+            const persona = new clsPersona(-1, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+            fetch("https://crudpaco.azurewebsites.net/api/personas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(persona),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('personaAgregadaFlag', 'true');
+                    location.reload();
+                }
+            });
+        } else if (accion.innerHTML == "Editar") {
+            const persona = new clsPersona(idEdit, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+            fetch(`https://crudpaco.azurewebsites.net/api/personas/${idEdit}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(persona),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('personaEditadaFlag', 'true');
+                    location.reload();
+                }
+            });
+        } 
+    } else if (pagina == 2) {
+        if (accion.innerHTML == "Insertar") {
+            const departamento = new clsDepartamento(-1, nombre);
+            fetch("https://crudpaco.azurewebsites.net/api/departamentos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(departamento),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('departamentoAgregadoFlag', 'true');
+                    localStorage.setItem('recargaDepartamentosFlag', 'true');
+                    location.reload();
+                }
+            });
+        } else if (accion.innerHTML == "Editar") {
+            const departamento = new clsDepartamento(idEdit, nombre);
+            fetch(`https://crudpaco.azurewebsites.net/api/departamentos/${idEdit}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(departamento),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('departamentoEditadoFlag', 'true');
+                    localStorage.setItem('recargaDepartamentosFlag', 'true');
+                    location.reload();
+                }
+            });
+        }
+    }
+}
+
+function cancelarAccion() {
+    accion.innerHTML == "Insertar"
+    if (pagina == 1) {
+        document.getElementById("inputNombre").value = "";
+        document.getElementById("inputApellidos").value = "";
+        document.getElementById("inputDireccion").value = "";
+        document.getElementById("inputFechaNac").value = "";
+        document.getElementById("inputFoto").value = "";
+        document.getElementById("selectDepartamentos").value = "elige";
+        document.getElementById("inputNumTelf").value = "";
+    } else if (pagina == 2) {
+        document.getElementById("inputNombre").value = "";
+    }
+}
+function cambiaPagina(evento) {
+    if (evento.target.id == "btnPersonas") {
+        localStorage.setItem('cambioPaginaPersonasFlag', 'true');
+        location.reload();
+    } else if (evento.target.id == "btnDepartamentos") {
+        localStorage.setItem('cambioPaginaDepartamentosFlag', 'true');
+        location.reload();
     }
 }

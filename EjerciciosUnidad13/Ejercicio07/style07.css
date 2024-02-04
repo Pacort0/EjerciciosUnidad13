@@ -10,3 +10,7 @@
 #botones button {
     margin-left: 10px; /* Adds space between buttons */
 }
+
+#botonesFormulario button{
+    margin-left:10px;
+}
