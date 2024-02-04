@@ -30,6 +30,8 @@ var idEdit;
 var btnPersonas;
 var btnDepartamentos;
 var pagina;
+var isCargando;
+var gifCargando;
 
 //Cuando se carga la página, se llama a esta función
 function inicioPagina() {
@@ -64,6 +66,7 @@ function inicioPagina() {
     accion = document.getElementById("tipoAccion");
     espacioForm = document.getElementById("espacioFormulario");
     idEdit = document.getElementById("idEdit");
+    gifCargando = document.getElementById("GIFCargando");
     peticionDepartamentos();
 
     //'Toasts' tras realizar algún tipo de cambio en las listas
@@ -241,6 +244,9 @@ function peticionDepartamentos() {
                         tr.appendChild(tdNombre);
                         tr.appendChild(btnEditar);
                         tr.appendChild(btnEliminar);
+
+                        gifCargando.style.display = "none";
+
                         listaHTML.appendChild(tr);
                     }
                 }
@@ -302,6 +308,9 @@ function peticionPersonas() {
                     tr.appendChild(tdDepartamento);
                     tr.appendChild(btnEditar);
                     tr.appendChild(btnEliminar);
+
+                    gifCargando.style.display = "none";
+
                     listaHTML.appendChild(tr);
                 }
             });
