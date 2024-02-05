@@ -30,7 +30,6 @@ var idEdit;
 var btnPersonas;
 var btnDepartamentos;
 var pagina;
-var isCargando;
 var gifCargando;
 
 //Cuando se carga la página, se llama a esta función
