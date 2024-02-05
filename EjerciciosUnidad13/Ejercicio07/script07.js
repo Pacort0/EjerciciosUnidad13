@@ -23,6 +23,7 @@ class clsDepartamento {
 
 var listaHTML = [];
 var listaDepartamentos = [];
+var filtroDepartamentos = [];
 var accion;
 var espacioForm;
 var listaPersonas = [];
@@ -31,6 +32,7 @@ var btnPersonas;
 var btnDepartamentos;
 var pagina;
 var gifCargando;
+var idFiltro;
 
 //Cuando se carga la página, se llama a esta función
 function inicioPagina() {
@@ -57,7 +59,9 @@ function inicioPagina() {
 
     creaFormulario();
     listaHTML = document.getElementById("lista");
-    listaDepartamentos = document.getElementById("selectDepartamentos")
+    selectDepartamentos = document.getElementById("selectDepartamentos");
+    filtroDepartamentos = document.getElementById("filtroDepartamentos");
+    filtroDepartamentos.addEventListener("change", filtraDept, false);
     btnEnviar = document.getElementById("btnEnviar").addEventListener("click", ejecutaAccion, false);
     btnCancelar = document.getElementById("btnCancelar").addEventListener("click", cancelarAccion, false);
     btnPersonas = document.getElementById("btnPersonas").addEventListener("click", cambiaPagina, false);
@@ -80,6 +84,12 @@ function inicioPagina() {
             showToast("Persona editada correctamente");
             localStorage.removeItem('personaEditadaFlag');
         }
+        if (localStorage.getItem('listaFiltradaFlag') > 0) {
+            idFiltro = localStorage.getItem('listaFiltradaFlag');
+            localStorage.removeItem('listaFiltradaFlag');
+        } else {
+            idFiltro = -1;
+        }
     } else if (pagina == 2) {
         if (localStorage.getItem('departamentoEliminadoFlag') == 'true') {
             showToast("Departamento eliminado correctamente");
@@ -98,6 +108,7 @@ function inicioPagina() {
 function creaFormulario() {
     //Tomamos el formulario de la pagina HTML
     var formulario = document.getElementById("idFormulario");
+    var headerLista = document.getElementById("headerLista");
 
     if (pagina == 1) {
         // Elementos del formulario
@@ -153,6 +164,31 @@ function creaFormulario() {
 
         divDept.appendChild(departmentSelect);
         formulario.appendChild(divDept);
+
+        // Añadimos el select de departamentos para filtrar
+        const labelFiltro = document.createElement("label");
+        labelFiltro.textContent = "Filtra por departamento";
+        headerLista.appendChild(labelFiltro);
+
+        const filtraDeptSelect = document.createElement("select");
+        filtraDeptSelect.name = "filtroDepartamentos";
+        filtraDeptSelect.id = "filtroDepartamentos";
+
+        //Opción por defecto
+        const optDefectoFiltro = document.createElement("option");
+        optDefectoFiltro.value = "elige";
+        optDefectoFiltro.selected = true;
+        optDefectoFiltro.textContent = "Filtra por departamento";
+        filtraDeptSelect.appendChild(optDefectoFiltro);
+
+        //Opción para listar todos
+        const optListarTodos = document.createElement("option");
+        optListarTodos.value = 0;
+        optListarTodos.textContent = "Listar todos";
+        filtraDeptSelect.appendChild(optListarTodos);
+
+        headerLista.appendChild(filtraDeptSelect);
+
     } else if (pagina == 2) { //Si la pagina es la de los departamentos
         var elementos = [
             { label: "Nombre del departamento", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
@@ -217,9 +253,10 @@ function peticionDepartamentos() {
                         opt.value = listaDepartamentos[i].idDepartamento; //El value de cada opcion será el id del departmento
                         opt.innerHTML = listaDepartamentos[i].nombreDepartamento; //El texto de cada opcion será el nombre del departento
                         selectDepartamentos.appendChild(opt);
+                        filtroDepartamentos.appendChild(opt.cloneNode(true));
                     }
                 }
-                peticionPersonas(); //Llamamos a la funcion cuando ya se ha completado el proceso de la lista de departamentos
+                peticionPersonas(idFiltro); //Llamamos a la funcion cuando ya se ha completado el proceso de la lista de departamentos
             } else if (pagina == 2) {
                 for (let i = 0; i < listaDepartamentos.length; i++) {
                     if (listaDepartamentos[i].idDepartamento != 5) { //Es el departamento por defecto
@@ -254,7 +291,7 @@ function peticionDepartamentos() {
 }
 
 //Función que recoge una lista de persona de la api y rellena una tabla de personas con nombre de departamento
-function peticionPersonas() {
+function peticionPersonas(filtrado) {
     if (pagina == 1) { //Solo se entra si la pagina es la pagina es la 1
         fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
             .then(response => {
@@ -266,9 +303,7 @@ function peticionPersonas() {
                 listaPersonas = data;
 
                 for (let i = 0; i < listaPersonas.length; i++) {
-                    //Para hacer la búsqueda de departamento
-                    let contadorDepartamentos = 0;
-                    let encontrado = false;
+
                     //Creamos los elementos necesarios de la lista por persona
                     var tr = document.createElement("tr");
                     var tdNombre = document.createElement("td");
@@ -276,38 +311,70 @@ function peticionPersonas() {
                     var tdDepartamento = document.createElement("td");
                     var btnEditar = document.createElement("button");
                     var btnEliminar = document.createElement("button");
-                    //Damos propiedades a los botones de cada persona
-                    btnEditar.id = listaPersonas[i].id;
-                    btnEditar.textContent = "Editar";
-                    btnEliminar.id = listaPersonas[i].id;
-                    btnEliminar.textContent = "Eliminar";
-                    btnEditar.addEventListener("click", editar, false);
-                    btnEliminar.addEventListener("click", eliminar, false);
 
-                    //Valor al nombre y apellidos de la persona
-                    tdNombre.innerHTML = listaPersonas[i].nombre;
-                    tdApellidos.innerHTML = listaPersonas[i].apellidos;
+                    if (filtrado == -1) {
+                        //Para hacer la búsqueda de departamento
+                        let contadorDepartamentos = 0;
+                        let encontrado = false;
 
-                    //Buscamos el departamento de la persona y ponemos el nombre en la tabla
-                    while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
-                        if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
-                            tdDepartamento.innerHTML = listaDepartamentos[contadorDepartamentos].nombreDepartamento;
-                            encontrado = true;
+                        //Damos propiedades a los botones de cada persona
+                        btnEditar.id = listaPersonas[i].id;
+                        btnEditar.textContent = "Editar";
+                        btnEliminar.id = listaPersonas[i].id;
+                        btnEliminar.textContent = "Eliminar";
+                        btnEditar.addEventListener("click", editar, false);
+                        btnEliminar.addEventListener("click", eliminar, false);
+
+                        //Valor al nombre y apellidos de la persona
+                        tdNombre.innerHTML = listaPersonas[i].nombre;
+                        tdApellidos.innerHTML = listaPersonas[i].apellidos;
+
+                        //Metemos en la tabla los valores encontrados
+                        tr.appendChild(tdNombre);
+                        tr.appendChild(tdApellidos);
+                        tr.appendChild(tdDepartamento);
+                        tr.appendChild(btnEditar);
+                        tr.appendChild(btnEliminar);
+                        //Buscamos el departamento de la persona y ponemos el nombre en la tabla
+                        while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
+                            if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
+                                tdDepartamento.innerHTML = listaDepartamentos[contadorDepartamentos].nombreDepartamento;
+                                encontrado = true;
+                            }
+                            contadorDepartamentos++;
                         }
-                        contadorDepartamentos++;
-                    } 
+                    } else {
+                        let contadorDepartamentos = 0;
+                        let encontrado = false;
 
-                    if (encontrado == false) {
-                        tdDepartamento.innerHTML = "Departamento N/A";
+                        while (contadorDepartamentos < listaDepartamentos.length && !encontrado) {
+                            if (filtrado == listaPersonas[i].idDepartamento) { //Si el departamento coincide con el filtro
+                                const idDept = listaDepartamentos.findIndex(dept => dept.idDepartamento == filtrado)
+                                tdDepartamento.innerHTML = listaDepartamentos[idDept].nombreDepartamento;
+                                encontrado = true;
+
+                                //Damos propiedades a los botones de cada persona
+                                btnEditar.id = listaPersonas[i].id;
+                                btnEditar.textContent = "Editar";
+                                btnEliminar.id = listaPersonas[i].id;
+                                btnEliminar.textContent = "Eliminar";
+                                btnEditar.addEventListener("click", editar, false);
+                                btnEliminar.addEventListener("click", eliminar, false);
+
+                                //Valor al nombre y apellidos de la persona
+                                tdNombre.innerHTML = listaPersonas[i].nombre;
+                                tdApellidos.innerHTML = listaPersonas[i].apellidos;
+
+                                //Metemos en la tabla los valores encontrados
+                                tr.appendChild(tdNombre);
+                                tr.appendChild(tdApellidos);
+                                tr.appendChild(tdDepartamento);
+                                tr.appendChild(btnEditar);
+                                tr.appendChild(btnEliminar);
+                            }
+                            contadorDepartamentos++;
+                        }
                     }
-
-                    //Metemos en la tabla los valores encontrados
-                    tr.appendChild(tdNombre);
-                    tr.appendChild(tdApellidos);
-                    tr.appendChild(tdDepartamento);
-                    tr.appendChild(btnEditar);
-                    tr.appendChild(btnEliminar);
-
                     gifCargando.style.display = "none";
 
                     listaHTML.appendChild(tr);
@@ -316,6 +383,11 @@ function peticionPersonas() {
     }
 }
 
+function filtraDept() {
+    const idDept = document.getElementById("filtroDepartamentos").value;
+    localStorage.setItem('listaFiltradaFlag', idDept);
+    location.reload();
+}
 
 //Cuando se pulse el botón de 'Editar', se llama a esta función, que pasa los datos de la persona a editar al formulario
 function editar(event) {
@@ -377,7 +449,7 @@ function eliminar(event) {
         }).then(response => {
             if (response.ok) { //Si la petición es correcta
                 localStorage.setItem('departamentoEliminadoFlag', 'true');
-                localStorage.setItem('recargaDepartamentosFlag', 'true');   
+                localStorage.setItem('recargaDepartamentosFlag', 'true');
                 location.reload();
             }
         });
@@ -437,7 +509,7 @@ function ejecutaAccion() {
                     location.reload();
                 }
             });
-        } 
+        }
     } else if (pagina == 2) {
         if (accion.innerHTML == "Insertar") {
             const departamento = new clsDepartamento(-1, nombre);
