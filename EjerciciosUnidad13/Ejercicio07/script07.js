@@ -60,8 +60,6 @@ function inicioPagina() {
     creaFormulario();
     listaHTML = document.getElementById("lista");
     selectDepartamentos = document.getElementById("selectDepartamentos");
-    filtroDepartamentos = document.getElementById("filtroDepartamentos");
-    filtroDepartamentos.addEventListener("change", filtraDept, false);
     btnEnviar = document.getElementById("btnEnviar").addEventListener("click", ejecutaAccion, false);
     btnCancelar = document.getElementById("btnCancelar").addEventListener("click", cancelarAccion, false);
     btnPersonas = document.getElementById("btnPersonas").addEventListener("click", cambiaPagina, false);
@@ -74,6 +72,10 @@ function inicioPagina() {
 
     //'Toasts' tras realizar algún tipo de cambio en las listas
     if (pagina == 1) {
+
+        filtroDepartamentos = document.getElementById("filtroDepartamentos");
+        filtroDepartamentos.addEventListener("change", filtraDept, false);
+
         if (localStorage.getItem('personaEliminadaFlag') == 'true') {
             showToast("Persona eliminada correctamente");
             localStorage.removeItem('personaEliminadaFlag');
