@@ -1,4 +1,4 @@
-﻿﻿window.onload = inicioPagina;
+﻿window.onload = inicioPagina;
 
 //clase persona
 class clsPersona {
@@ -57,18 +57,10 @@ function inicioPagina() {
         tituloLista.textContent = "Lista de personas";
     }
 
-    creaFormulario();
     listaHTML = document.getElementById("lista");
-    selectDepartamentos = document.getElementById("selectDepartamentos");
-    btnEnviar = document.getElementById("btnEnviar").addEventListener("click", ejecutaAccion, false);
-    btnCancelar = document.getElementById("btnCancelar").addEventListener("click", cancelarAccion, false);
-    btnPersonas = document.getElementById("btnPersonas").addEventListener("click", cambiaPagina, false);
-    btnDepartamentos = document.getElementById("btnDepartamentos").addEventListener("click", cambiaPagina, false);
-    accion = document.getElementById("tipoAccion");
-    espacioForm = document.getElementById("espacioFormulario");
-    idEdit = document.getElementById("idEdit");
     gifCargando = document.getElementById("GIFCargando");
     peticionDepartamentos();
+
 
     //'Toasts' tras realizar algún tipo de cambio en las listas
     if (pagina == 1) {
@@ -107,140 +99,37 @@ function inicioPagina() {
 
 }
 
-function creaFormulario() {
-    //Tomamos el formulario de la pagina HTML
-    var formulario = document.getElementById("idFormulario");
-    var headerLista = document.getElementById("headerLista");
-
-    if (pagina == 1) {
-        // Elementos del formulario
-        var elementos = [
-            { label: "Nombre", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
-            { label: "Apellidos", type: "text", id: "inputApellidos", placeholder: "Apellidos", required: true },
-            { label: "Fecha de nacimiento", type: "date", id: "inputFechaNac", placeholder: "Fecha de nacimiento", required: true },
-            { label: "Direccion", type: "text", id: "inputDireccion", placeholder: "Dirección", required: true },
-            { label: "Número de teléfono", type: "tel", id: "inputNumTelf", placeholder: "Núm. de teléfono", required: true },
-            { label: "Foto", type: "text", id: "inputFoto", placeholder: "Url de imagen", required: true },
-        ];
-
-        // Creamos cada label y cada input del form linea a linea
-        elementos.forEach(function (elemento) {
-            var label = document.createElement("label");
-            label.htmlFor = elemento.id;
-            label.textContent = elemento.label;
-            formulario.appendChild(label);
-
-            formulario.appendChild(document.createElement("br"));
-
-            var input = document.createElement("input");
-            input.type = elemento.type;
-            input.id = elemento.id;
-            input.placeholder = elemento.placeholder;
-            if (elemento.required) {
-                input.required = true;
-            }
-            formulario.appendChild(input);
-
-            formulario.appendChild(document.createElement("br"));
-        });
-
-        // Añadimos el select de departamentos
-        const labelDept = document.createElement("label");
-        labelDept.textContent = "Escoge un departamento";
-        formulario.appendChild(labelDept);
-
-        //Si no pongo un div me da error el botón de submit
-        const divDept = document.createElement("div");
-        divDept.id = "divSelectDepartamentos";
-
-        const departmentSelect = document.createElement("select");
-        departmentSelect.name = "tablaDepartamentos";
-        departmentSelect.id = "selectDepartamentos";
-
-        //Opción por defecto
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "elige";
-        defaultOption.selected = true;
-        defaultOption.textContent = "Elige un departamento";
-        departmentSelect.appendChild(defaultOption);
-
-        divDept.appendChild(departmentSelect);
-        formulario.appendChild(divDept);
-
-        // Añadimos el select de departamentos para filtrar
-        const labelFiltro = document.createElement("label");
-        labelFiltro.textContent = "Filtra por departamento";
-        headerLista.appendChild(labelFiltro);
-
-        const filtraDeptSelect = document.createElement("select");
-        filtraDeptSelect.name = "filtroDepartamentos";
-        filtraDeptSelect.id = "filtroDepartamentos";
-
-        //Opción por defecto
-        const optDefectoFiltro = document.createElement("option");
-        optDefectoFiltro.value = "elige";
-        optDefectoFiltro.selected = true;
-        optDefectoFiltro.textContent = "Filtra por departamento";
-        filtraDeptSelect.appendChild(optDefectoFiltro);
-
-        //Opción para listar todos
-        const optListarTodos = document.createElement("option");
-        optListarTodos.value = 0;
-        optListarTodos.textContent = "Listar todos";
-        filtraDeptSelect.appendChild(optListarTodos);
-
-        headerLista.appendChild(filtraDeptSelect);
-
-    } else if (pagina == 2) { //Si la pagina es la de los departamentos
-        var elementos = [
-            { label: "Nombre del departamento", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
-        ];
-
-        // Creamos cada label y cada input del form linea a linea
-        elementos.forEach(function (elementInfo) {
-            var label = document.createElement("label");
-            label.htmlFor = elementInfo.id;
-            label.textContent = elementInfo.label;
-            formulario.appendChild(label);
-
-            formulario.appendChild(document.createElement("br"));
-
-            var input = document.createElement("input");
-            input.type = elementInfo.type;
-            input.id = elementInfo.id;
-            input.placeholder = elementInfo.placeholder;
-            if (elementInfo.required) {
-                input.required = true;
-            }
-            formulario.appendChild(input);
-
-            formulario.appendChild(document.createElement("br"));
-        });
-    }
-    const botonesDiv = document.createElement("div");
-    botonesDiv.id = "botonesFormulario";
-
-    const btnEnviar = document.createElement("input");
-    btnEnviar.type = "button";
-    btnEnviar.id = "btnEnviar";
-    btnEnviar.value = "Enviar";
-    botonesDiv.appendChild(btnEnviar);
-
-    const btnCancelar = document.createElement("input");
-    btnCancelar.type = "button";
-    btnCancelar.id = "btnCancelar";
-    btnCancelar.value = "Cancelar";
-    botonesDiv.appendChild(btnCancelar);
-
-    formulario.appendChild(botonesDiv);
-}
-
-
 const optionGet = {
     method: "GET"
 };
 //Función que recoge una lista de departamentos de la api y rellena el select de departamentos
 function peticionDepartamentos() {
+    var bodyTabla = document.getElementById("bodyTabla");
+
+    // Añadimos el select de departamentos para filtrar
+    const labelFiltro = document.createElement("label");
+    labelFiltro.textContent = "Filtra por departamento";
+    bodyTabla.appendChild(labelFiltro);
+
+    const filtraDeptSelect = document.createElement("select");
+    filtraDeptSelect.name = "filtroDepartamentos";
+    filtraDeptSelect.id = "filtroDepartamentos";
+
+    //Opción por defecto
+    const optDefectoFiltro = document.createElement("option");
+    optDefectoFiltro.value = "elige";
+    optDefectoFiltro.selected = true;
+    optDefectoFiltro.textContent = "Filtra por departamento";
+    filtraDeptSelect.appendChild(optDefectoFiltro);
+
+    //Opción para listar todos
+    const optListarTodos = document.createElement("option");
+    optListarTodos.value = 0;
+    optListarTodos.textContent = "Listar todos";
+    filtraDeptSelect.appendChild(optListarTodos);
+
+    bodyTabla.appendChild(filtraDeptSelect);
+
     fetch("https://crudpaco.azurewebsites.net/api/departamentos", optionGet)
         .then(response => {
             if (response.ok) { //Si la petición es correcta
@@ -254,7 +143,7 @@ function peticionDepartamentos() {
                         var opt = document.createElement("option");
                         opt.value = listaDepartamentos[i].idDepartamento; //El value de cada opcion será el id del departmento
                         opt.innerHTML = listaDepartamentos[i].nombreDepartamento; //El texto de cada opcion será el nombre del departento
-                        selectDepartamentos.appendChild(opt);
+                        //selectDepartamentos.appendChild(opt);
                         filtroDepartamentos.appendChild(opt.cloneNode(true));
                     }
                 }
@@ -291,8 +180,6 @@ function peticionDepartamentos() {
             }
         });
 }
-
-//Función que recoge una lista de persona de la api y rellena una tabla de personas con nombre de departamento
 function peticionPersonas(filtrado) {
     if (pagina == 1) { //Solo se entra si la pagina es la pagina es la 1
         fetch("https://crudpaco.azurewebsites.net/api/personas", optionGet)
@@ -305,6 +192,11 @@ function peticionPersonas(filtrado) {
                 listaPersonas = data;
 
                 for (let i = 0; i < listaPersonas.length; i++) {
+
+                    document.getElementById("tableContainer").innerHTML = "";
+                    // Create a new table
+                    var table = document.createElement("table");
+                    table.id = "lista";
 
                     //Creamos los elementos necesarios de la lista por persona
                     var tr = document.createElement("tr");
@@ -332,8 +224,6 @@ function peticionPersonas(filtrado) {
                         var fotica = document.createElement("img");
                         fotica.src = listaPersonas[i].imageURL;
                         fotica.alt = "Foto de perfil";
-                        fotica.width = 50;
-                        fotica.height = 50;
 
                         // Añadimos los elementos a las celdas
                         tdFoto.appendChild(fotica);
@@ -377,8 +267,6 @@ function peticionPersonas(filtrado) {
                                 var fotica = document.createElement("img");
                                 fotica.src = listaPersonas[i].imageURL;
                                 fotica.alt = "Foto de perfil";
-                                fotica.width = 50;
-                                fotica.height = 50;
 
                                 // Añadimos los elementos a las celdas
                                 tdFoto.appendChild(fotica);
@@ -397,9 +285,9 @@ function peticionPersonas(filtrado) {
                         }
                     }
                     gifCargando.style.display = "none";
-
-                    listaHTML.appendChild(tr);
+                    table.appendChild(tr);
                 }
+                document.getElementById("tableContainer").appendChild(table);
             });
     }
 }
@@ -409,8 +297,6 @@ function filtraDept() {
     localStorage.setItem('listaFiltradaFlag', idDept);
     location.reload();
 }
-
-//Cuando se pulse el botón de 'Editar', se llama a esta función, que pasa los datos de la persona a editar al formulario
 function editar(event) {
     accion.innerHTML = "Editar";
     const elementoAEditar = event.target;
