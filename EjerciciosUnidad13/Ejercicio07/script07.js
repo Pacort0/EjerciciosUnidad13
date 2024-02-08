@@ -311,6 +311,7 @@ function peticionPersonas(filtrado) {
                     var tdNombre = document.createElement("td");
                     var tdApellidos = document.createElement("td");
                     var tdDepartamento = document.createElement("td");
+                    var tdFoto = document.createElement("td");
                     var btnEditar = document.createElement("button");
                     var btnEliminar = document.createElement("button");
 
@@ -327,11 +328,18 @@ function peticionPersonas(filtrado) {
                         btnEditar.addEventListener("click", editar, false);
                         btnEliminar.addEventListener("click", eliminar, false);
 
-                        //Valor al nombre y apellidos de la persona
+                        //Preparamos la foto de perfil
+                        var fotica = document.createElement("img");
+                        fotica.src = listaPersonas[i].imageURL;
+                        fotica.alt = "Foto de perfil";
+
+                        // Añadimos los elementos a las celdas
+                        tdFoto.appendChild(fotica);
                         tdNombre.innerHTML = listaPersonas[i].nombre;
                         tdApellidos.innerHTML = listaPersonas[i].apellidos;
 
                         //Metemos en la tabla los valores encontrados
+                        tr.appendChild(tdFoto);
                         tr.appendChild(tdNombre);
                         tr.appendChild(tdApellidos);
                         tr.appendChild(tdDepartamento);
@@ -363,11 +371,18 @@ function peticionPersonas(filtrado) {
                                 btnEditar.addEventListener("click", editar, false);
                                 btnEliminar.addEventListener("click", eliminar, false);
 
-                                //Valor al nombre y apellidos de la persona
+                                //Preparamos la foto de perfil
+                                var fotica = document.createElement("img");
+                                fotica.src = listaPersonas[i].imageURL;
+                                fotica.alt = "Foto de perfil";
+
+                                // Añadimos los elementos a las celdas
+                                tdFoto.appendChild(fotica);
                                 tdNombre.innerHTML = listaPersonas[i].nombre;
                                 tdApellidos.innerHTML = listaPersonas[i].apellidos;
 
                                 //Metemos en la tabla los valores encontrados
+                                tr.appendChild(tdFoto);
                                 tr.appendChild(tdNombre);
                                 tr.appendChild(tdApellidos);
                                 tr.appendChild(tdDepartamento);
