@@ -220,6 +220,7 @@ function peticionPersonas(filtrado) {
                     //Creamos los elementos necesarios de la lista por persona
                     var tr = document.createElement("tr");
                     tr.addEventListener("click", editar, false);
+                    tr.id = listaPersonas[i].id;
 
                     var tdNombre = document.createElement("td");
                     var tdApellidos = document.createElement("td");
@@ -227,11 +228,15 @@ function peticionPersonas(filtrado) {
                     var tdFoto = document.createElement("td");
                     var btnEliminar = document.createElement("button");
 
+                    tdNombre.id = listaPersonas[i].id;
+                    tdApellidos.id = listaPersonas[i].id;
+                    tdDepartamento.id = listaPersonas[i].id;
+                    tdFoto.id = listaPersonas[i].id;
+
                     if (filtrado == -1) {
                         //Para hacer la búsqueda de departamento
                         let contadorDepartamentos = 0;
                         let encontrado = false;
-                        tr.id = listaPersonas[i].id;
 
                         //Damos propiedades a los botones de cada persona
                         btnEliminar.id = listaPersonas[i].id;
@@ -273,7 +278,6 @@ function peticionPersonas(filtrado) {
                                 const idDept = listaDepartamentos.findIndex(dept => dept.idDepartamento == filtrado)
                                 tdDepartamento.innerHTML = listaDepartamentos[idDept].nombreDepartamento;
                                 encontrado = true;
-                                tr.id = listaPersonas[i].id;
 
                                 //Damos propiedades a los botones de cada persona
                                 btnEliminar.id = listaPersonas[i].id;
@@ -313,6 +317,7 @@ function peticionPersonas(filtrado) {
 function editar(event) {
     creaFormulario();
     const elementoAEditar = event.target;
+    console.log(event.target);
 
     if (pagina == 1) {
 
@@ -465,6 +470,15 @@ function creaFormulario() {
         defaultOption.selected = true;
         defaultOption.textContent = "Elige un departamento";
         departmentSelect.appendChild(defaultOption);
+
+        for (let i = 0; i < listaDepartamentos.length; i++) { //Creamos las opciones del select
+            if (listaDepartamentos[i].idDepartamento != 5) {
+                var opt = document.createElement("option");
+                opt.value = listaDepartamentos[i].idDepartamento; //El value de cada opcion será el id del departmento
+                opt.innerHTML = listaDepartamentos[i].nombreDepartamento; //El texto de cada opcion será el nombre del departento
+                departmentSelect.appendChild(opt);
+            }
+        }
 
         divDept.appendChild(departmentSelect);
         formulario.appendChild(divDept);
