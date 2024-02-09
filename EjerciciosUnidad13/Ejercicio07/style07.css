@@ -13,10 +13,10 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url(background_ajax.jpg) center / cover;
+    background: url(images/background_ajax.jpg) center / cover;
 }
 
-td img{
+.fotoPerfil img{
     width: 80px;
     height: 80px;
     margin-right: .5rem;
@@ -140,7 +140,7 @@ td {
     background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1500; /* Higher z-index */
 }
 
 /* Styles for the modal container */
@@ -153,11 +153,11 @@ td {
     width: 100%;
     max-height: 80%; /* Adjust as needed */
     overflow-y: auto;
-    position: absolute; /* or position: fixed; */
+    position: fixed; /* Fixed position */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1001; /* Higher z-index than the table */
+    z-index: 1600; /* Higher z-index than .overlay and other page elements */
 }
 
 /* Optional: Style for the close button */
@@ -205,3 +205,31 @@ td {
     background-color: #0056b3;
 }
 
+.imgEliminar img{
+    width: 80px;
+    height: 80px;
+    margin-right: .5rem;
+    vertical-align: middle;
+}
+
+.imgEliminar img:hover {
+    background-color:#ff0000;
+    filter: brightness(1.5); /* Example: increase brightness for hover effect */
+}
+
+/* Additional styles for the trash icon */
+tbody .imgEliminar img {
+    transition: filter 0.3s ease; /* Add a smooth transition effect */
+}
+
+.table_header img{
+    width: 80px;
+    height: 80px;
+}
+
+.agregar *{
+    vertical-align: middle;
+    text-align: center;
+    font-size: 25px;
+    margin:10px;
+}

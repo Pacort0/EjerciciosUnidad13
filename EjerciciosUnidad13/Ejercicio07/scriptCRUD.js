@@ -30,6 +30,11 @@ var pagina;
 var headerTabla;
 var gifCargando;
 var idFiltro;
+var accion = "Insertar";
+var overlay; 
+var labelInsert;
+var imgInsertar;
+
 
 function inicioPagina() {
     lista = document.getElementById("lista");
@@ -37,6 +42,10 @@ function inicioPagina() {
     btnDepartamentos = document.getElementById("btnDepartamentos");
     headerTabla = document.getElementById("headerTabla");
     gifCargando = document.getElementById("GIFCargando");
+    labelInsert = document.getElementById("labelInserta");
+    imgInsertar = document.getElementById("imgAgrega");
+
+    imgInsertar.addEventListener("click", insertar, false);
 
     if (localStorage.getItem('cambioPaginaDepartamentosFlag') == 'true') {
         pagina = 2;
@@ -58,6 +67,8 @@ function inicioPagina() {
 
     if (pagina == 1) {
 
+        labelInsert.innerHTML = "Inserta una persona";
+
         if (localStorage.getItem('personaEliminadaFlag') == 'true') {
             showToast("Persona eliminada correctamente");
             localStorage.removeItem('personaEliminadaFlag');
@@ -75,6 +86,9 @@ function inicioPagina() {
             idFiltro = -1;
         }
     } else if (pagina == 2) {
+
+        labelInsert.innerHTML = "Inserta un departamento";
+
         if (localStorage.getItem('departamentoEliminadoFlag') == 'true') {
             showToast("Departamento eliminado correctamente");
             localStorage.removeItem('departamentoEliminadoFlag');
@@ -154,18 +168,24 @@ function peticionDepartamentos() {
                         tr.addEventListener("click", editar, false);
 
                         var tdNombre = document.createElement("td");
-                        var btnEliminar = document.createElement("button");
+                        var tdEliminar = document.createElement("td");
+                        var imgEliminar = document.createElement("img");
+                        tdEliminar.className = "imgEliminar";
+
+                        tdNombre.id = listaDepartamentos[i].idDepartamento;
+                        
                         //Damos propiedades a los botones de cada persona
-                        btnEliminar.id = listaDepartamentos[i].idDepartamento;
-                        btnEliminar.textContent = "Eliminar";
-                        btnEliminar.addEventListener("click", eliminar, false);
+                        imgEliminar.id = listaDepartamentos[i].idDepartamento;
+                        imgEliminar.src = "images/papelera.png";
+                        imgEliminar.addEventListener("click", eliminar, false);
+                        tdEliminar.appendChild(imgEliminar);
 
                         //Valor al nombre y apellidos de la persona
                         tdNombre.innerHTML = listaDepartamentos[i].nombreDepartamento;
 
                         //Metemos en la tabla los valores encontrados
                         tr.appendChild(tdNombre);
-                        tr.appendChild(btnEliminar);
+                        tr.appendChild(tdEliminar);
 
                         gifCargando.style.display = "none";
 
@@ -226,7 +246,10 @@ function peticionPersonas(filtrado) {
                     var tdApellidos = document.createElement("td");
                     var tdDepartamento = document.createElement("td");
                     var tdFoto = document.createElement("td");
-                    var btnEliminar = document.createElement("button");
+                    var tdEliminar = document.createElement("td");
+                    var imgEliminar = document.createElement("img");
+                    tdEliminar.className = "imgEliminar";
+                    tdFoto.className = "fotoPerfil";
 
                     tdNombre.id = listaPersonas[i].id;
                     tdApellidos.id = listaPersonas[i].id;
@@ -239,16 +262,17 @@ function peticionPersonas(filtrado) {
                         let encontrado = false;
 
                         //Damos propiedades a los botones de cada persona
-                        btnEliminar.id = listaPersonas[i].id;
-                        btnEliminar.textContent = "Eliminar";
-                        btnEliminar.addEventListener("click", eliminar, false);
+                        imgEliminar.id = listaPersonas[i].id;
+                        imgEliminar.src = "images/papelera.png";
+                        imgEliminar.alt = "papelera";
+                        imgEliminar.addEventListener("click", eliminar, false);
+                        tdEliminar.appendChild(imgEliminar);
 
                         //Preparamos la foto de perfil
                         var fotica = document.createElement("img");
                         fotica.src = listaPersonas[i].imageURL;
                         fotica.alt = "Foto de perfil";
-                        fotica.width = 50;
-                        fotica.height = 50;
+                        fotica.id = listaPersonas[i].id;
 
                         // Añadimos los elementos a las celdas
                         tdFoto.appendChild(fotica);
@@ -260,7 +284,7 @@ function peticionPersonas(filtrado) {
                         tr.appendChild(tdNombre);
                         tr.appendChild(tdApellidos);
                         tr.appendChild(tdDepartamento);
-                        tr.appendChild(btnEliminar);
+                        tr.appendChild(tdEliminar);
                         //Buscamos el departamento de la persona y ponemos el nombre en la tabla
                         while (encontrado == false && contadorDepartamentos < listaDepartamentos.length) {
                             if (listaDepartamentos[contadorDepartamentos].idDepartamento == listaPersonas[i].idDepartamento) {
@@ -280,16 +304,17 @@ function peticionPersonas(filtrado) {
                                 encontrado = true;
 
                                 //Damos propiedades a los botones de cada persona
-                                btnEliminar.id = listaPersonas[i].id;
-                                btnEliminar.textContent = "Eliminar";
-                                btnEliminar.addEventListener("click", eliminar, false);
+                                imgEliminar.id = listaPersonas[i].id;
+                                imgEliminar.src = "images/papelera.png";
+                                imgEliminar.alt = "papelera";
+                                imgEliminar.addEventListener("click", eliminar, false);
+                                tdEliminar.appendChild(imgEliminar);
 
                                 //Preparamos la foto de perfil
                                 var fotica = document.createElement("img");
                                 fotica.src = listaPersonas[i].imageURL;
                                 fotica.alt = "Foto de perfil";
-                                fotica.width = 50;
-                                fotica.height = 50;
+                                fotica.id = listaPersonas[i].id;
 
                                 // Añadimos los elementos a las celdas
                                 tdFoto.appendChild(fotica);
@@ -301,7 +326,7 @@ function peticionPersonas(filtrado) {
                                 tr.appendChild(tdNombre);
                                 tr.appendChild(tdApellidos);
                                 tr.appendChild(tdDepartamento);
-                                tr.appendChild(btnEliminar);
+                                tr.appendChild(imgEliminar);
                             }
                             contadorDepartamentos++;
                         }
@@ -314,13 +339,27 @@ function peticionPersonas(filtrado) {
             });
     }
 }
-function editar(event) {
+
+function insertar(event) {
+
     creaFormulario();
+    overlay = document.getElementById("overlayModal");
     const elementoAEditar = event.target;
     console.log(event.target);
 
-    if (pagina == 1) {
+    overlay.style.display = "block";
+}
+function editar(event) {
 
+    accion = "Editar";
+    creaFormulario();
+    overlay = document.getElementById("overlayModal");
+    const elementoAEditar = event.target;
+    console.log(event.target);
+
+    if (pagina == 1 && elementoAEditar.alt != "papelera") {
+
+        overlay.style.display = "block";
         const datosPersona = listaPersonas.find(persona => persona.id == elementoAEditar.id);
         const fechaNacFormateada = datosPersona.fechaNac.substring(0, 10);
         idEdit = elementoAEditar.id;
@@ -338,10 +377,15 @@ function editar(event) {
         document.getElementById("inputNumTelf").value = datosPersona.telefono;
     } else if (pagina == 2) {
 
+        overlay.style.display = "block";
         const datosDepartamento = listaDepartamentos.find(departamento => departamento.idDepartamento == elementoAEditar.id);
         idEdit = elementoAEditar.id;
 
         document.getElementById("inputNombre").value = datosDepartamento.nombreDepartamento;
+    } else if (formularioCreado == true) {
+        var bodyTabla = document.getElementById("bodyTabla");
+        const divFormulario = document.getElementById("divFormulario");
+        bodyTabla.removeChild(divFormulario);
     }
 }
 
@@ -386,18 +430,10 @@ function filtraDept() {
 }
 
 function cancelarAccion() {
-    accion.innerHTML == "Insertar"
-    if (pagina == 1) {
-        document.getElementById("inputNombre").value = "";
-        document.getElementById("inputApellidos").value = "";
-        document.getElementById("inputDireccion").value = "";
-        document.getElementById("inputFechaNac").value = "";
-        document.getElementById("inputFoto").value = "";
-        document.getElementById("selectDepartamentos").value = "elige";
-        document.getElementById("inputNumTelf").value = "";
-    } else if (pagina == 2) {
-        document.getElementById("inputNombre").value = "";
-    }
+    var bodyTabla = document.getElementById("bodyTabla");
+    overlay = document.getElementById("overlayModal");
+    bodyTabla.removeChild(overlay);
+    overlay.style.display = "none";
 }
 function cambiaPagina(evento) {
     if (evento.target.id == "btnPersonas") {
@@ -409,6 +445,80 @@ function cambiaPagina(evento) {
     }
 }
 
+function ejecutaAccion() {
+    const nombre = document.getElementById("inputNombre").value;
+    if (pagina == 1) {
+        const apellidos = document.getElementById("inputApellidos").value;
+        const fechaNac = document.getElementById("inputFechaNac").value + "T00:00:00"; //DateTime
+        const direccion = document.getElementById("inputDireccion").value;
+        const foto = document.getElementById("inputFoto").value;
+        const numTelf = document.getElementById("inputNumTelf").value;
+        const departamento = document.getElementById("selectDepartamentos").value;
+
+        if (accion == "Insertar") {
+            const persona = new clsPersona(-1, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+            fetch("https://crudpaco.azurewebsites.net/api/personas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(persona),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('personaAgregadaFlag', 'true');
+                    location.reload();
+                }
+            });
+        } else if (accion == "Editar") {
+            const persona = new clsPersona(idEdit, nombre, apellidos, direccion, fechaNac, numTelf, foto, departamento);
+            fetch(`https://crudpaco.azurewebsites.net/api/personas/${idEdit}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(persona),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('personaEditadaFlag', 'true');
+                    location.reload();
+                }
+            });
+        }
+    } else if (pagina == 2) {
+        if (accion == "Insertar") {
+            const departamento = new clsDepartamento(-1, nombre);
+            fetch("https://crudpaco.azurewebsites.net/api/departamentos", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(departamento),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('departamentoAgregadoFlag', 'true');
+                    localStorage.setItem('recargaDepartamentosFlag', 'true');
+                    location.reload();
+                }
+            });
+        } else if (accion == "Editar") {
+            const departamento = new clsDepartamento(idEdit, nombre);
+            fetch(`https://crudpaco.azurewebsites.net/api/departamentos/${idEdit}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(departamento),
+            }).then(response => {
+                if (response.ok) { //Si la petición es correcta
+                    localStorage.setItem('departamentoEditadoFlag', 'true');
+                    localStorage.setItem('recargaDepartamentosFlag', 'true');
+                    location.reload();
+                }
+            });
+        }
+    }
+}
+
 function showToast() {
 
 }
@@ -417,7 +527,11 @@ function creaFormulario() {
     var bodyTabla = document.getElementById("bodyTabla");
     var divForm = document.createElement("div");
     divForm.className = "modalForm";
+    divForm.id = "divFormulario";
     var formulario = document.createElement("form");
+    var overlayModal = document.createElement("div");
+    overlayModal.className = "overlay";
+    overlayModal.id = "overlayModal";
 
     if (pagina == 1) {
         // Elementos del formulario
@@ -482,11 +596,6 @@ function creaFormulario() {
 
         divDept.appendChild(departmentSelect);
         formulario.appendChild(divDept);
-
-        divForm.appendChild(formulario);
-
-        bodyTabla.appendChild(divForm);
-
     } else if (pagina == 2) { //Si la pagina es la de los departamentos
         var elementos = [
             { label: "Nombre del departamento", type: "text", id: "inputNombre", placeholder: "Nombre", required: true },
@@ -520,13 +629,22 @@ function creaFormulario() {
     btnEnviar.type = "button";
     btnEnviar.id = "btnEnviar";
     btnEnviar.value = "Enviar";
+    btnEnviar.addEventListener("click", ejecutaAccion, false);
     botonesDiv.appendChild(btnEnviar);
 
     const btnCancelar = document.createElement("input");
     btnCancelar.type = "button";
     btnCancelar.id = "btnCancelar";
     btnCancelar.value = "Cancelar";
+    btnCancelar.addEventListener("click", cancelarAccion, false);
     botonesDiv.appendChild(btnCancelar);
 
     formulario.appendChild(botonesDiv);
+
+    divForm.appendChild(formulario);
+
+    overlayModal.appendChild(divForm);
+
+    bodyTabla.appendChild(overlayModal);
+
 }
