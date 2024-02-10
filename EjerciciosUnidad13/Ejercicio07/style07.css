@@ -185,8 +185,8 @@ td {
 /* Optional: Style for the select dropdown */
 .modalForm select {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 16px;
+    padding: 7px;
+    margin-bottom: 7px;
     box-sizing: border-box;
 }
 
@@ -219,12 +219,12 @@ td {
 
 /* Additional styles for the trash icon */
 tbody .imgEliminar img {
-    transition: filter 0.3s ease; /* Add a smooth transition effect */
+    transition: filter 1s ease; /* Add a smooth transition effect */
 }
 
 .table_header img{
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
 }
 
 .agregar *{
@@ -232,4 +232,9 @@ tbody .imgEliminar img {
     text-align: center;
     font-size: 25px;
     margin:10px;
+}
+
+#toastSection label{
+    font-size: 30px;
+    margin-left: 15px;
 }

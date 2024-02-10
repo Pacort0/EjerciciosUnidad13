@@ -30,12 +30,12 @@ var pagina;
 var headerTabla;
 var gifCargando;
 var idFiltro;
-var accion = "Insertar";
+var accion = "Insertar"; //Por defecto, es inserción
 var overlay; 
 var labelInsert;
 var imgInsertar;
 
-
+//Se llama al cargar la página
 function inicioPagina() {
     lista = document.getElementById("lista");
     btnPersonas = document.getElementById("btnPersonas");
@@ -46,7 +46,10 @@ function inicioPagina() {
     imgInsertar = document.getElementById("imgAgrega");
 
     imgInsertar.addEventListener("click", insertar, false);
+    btnPersonas.addEventListener("click", cambiaPagina, false);
+    btnDepartamentos.addEventListener("click", cambiaPagina, false);
 
+    //Comprobamos si hay alguna flag en el almacenamiento que indique que si se debe recargar una página u otra
     if (localStorage.getItem('cambioPaginaDepartamentosFlag') == 'true') {
         pagina = 2;
         localStorage.removeItem('cambioPaginaDepartamentosFlag');
@@ -60,15 +63,13 @@ function inicioPagina() {
         pagina = 1; //Por defecto, la página es la de personas
     }
 
-    btnPersonas = document.getElementById("btnPersonas").addEventListener("click", cambiaPagina, false);
-    btnDepartamentos = document.getElementById("btnDepartamentos").addEventListener("click", cambiaPagina, false);
+    peticionDepartamentos(); //Llamamos a la API para conseguir un listado de los departamentos
 
-    peticionDepartamentos();
-
-    if (pagina == 1) {
+    if (pagina == 1) { //Si la página a cargar es la de personas
 
         labelInsert.innerHTML = "Inserta una persona";
 
+        //Comprobamos si hay algún mensaje toast que mostrar
         if (localStorage.getItem('personaEliminadaFlag') == 'true') {
             showToast("Persona eliminada correctamente");
             localStorage.removeItem('personaEliminadaFlag');
@@ -79,13 +80,14 @@ function inicioPagina() {
             showToast("Persona editada correctamente");
             localStorage.removeItem('personaEditadaFlag');
         }
+        //Comprobamos si se ha aplicado algún filtro a la lista
         if (localStorage.getItem('listaFiltradaFlag') > 0) {
             idFiltro = localStorage.getItem('listaFiltradaFlag');
             localStorage.removeItem('listaFiltradaFlag');
         } else {
             idFiltro = -1;
         }
-    } else if (pagina == 2) {
+    } else if (pagina == 2) { //Si la página es la de los departamentos, procedemos igual
 
         labelInsert.innerHTML = "Inserta un departamento";
 
@@ -106,6 +108,8 @@ function inicioPagina() {
 const optionGet = {
     method: "GET"
 };
+
+//Pedimos la lista de departamentos
 function peticionDepartamentos() {
     fetch("https://crudpaco.azurewebsites.net/api/departamentos", optionGet)
         .then(response => {
@@ -135,6 +139,7 @@ function peticionDepartamentos() {
                 filtraDeptSelect.appendChild(optListarTodos);
                 filtraDeptSelect.addEventListener("change", filtraDept, false);
 
+                //Insertamos el select en el header de la tabla
                 headerTabla.appendChild(filtraDeptSelect);
 
                 for (let i = 0; i < listaDepartamentos.length; i++) { //Creamos las opciones del select
@@ -163,7 +168,7 @@ function peticionDepartamentos() {
 
                 for (let i = 0; i < listaDepartamentos.length; i++) {
                     if (listaDepartamentos[i].idDepartamento != 5) { //Es el departamento por defecto
-                        //Creamos los elementos necesarios de la lista por persona
+                        //Creamos los elementos necesarios de la lista por departamento
                         var tr = document.createElement("tr");
                         tr.addEventListener("click", editar, false);
 
@@ -174,25 +179,26 @@ function peticionDepartamentos() {
 
                         tdNombre.id = listaDepartamentos[i].idDepartamento;
                         
-                        //Damos propiedades a los botones de cada persona
+                        //Configuramos el 'botón' de eliminar departamento
                         imgEliminar.id = listaDepartamentos[i].idDepartamento;
                         imgEliminar.src = "images/papelera.png";
                         imgEliminar.addEventListener("click", eliminar, false);
                         tdEliminar.appendChild(imgEliminar);
 
-                        //Valor al nombre y apellidos de la persona
+                        //Valor del nombre de departamento
                         tdNombre.innerHTML = listaDepartamentos[i].nombreDepartamento;
 
-                        //Metemos en la tabla los valores encontrados
+                        //Metemos en la tabla los td
                         tr.appendChild(tdNombre);
                         tr.appendChild(tdEliminar);
 
+                        //Dejamos de mostrar el gif de cargando
                         gifCargando.style.display = "none";
 
-                        tr.id = listaDepartamentos[i].id;
+                        tr.id = listaDepartamentos[i].id; //Id de la fila
                         tbody.appendChild(tr);
                     }
-                    lista.appendChild(tbody);
+                    lista.appendChild(tbody); //Añadimos el tbody a la tabla
                 }
             }
         });
@@ -326,7 +332,7 @@ function peticionPersonas(filtrado) {
                                 tr.appendChild(tdNombre);
                                 tr.appendChild(tdApellidos);
                                 tr.appendChild(tdDepartamento);
-                                tr.appendChild(imgEliminar);
+                                tr.appendChild(tdEliminar);
                             }
                             contadorDepartamentos++;
                         }
@@ -519,8 +525,17 @@ function ejecutaAccion() {
     }
 }
 
-function showToast() {
+function showToast(mensaje) {
+    const toastSection = document.getElementById("toastSection");
+    var toast = document.createElement("label");
+    toast.innerHTML = mensaje.bold();
+    toast.style.fontSize = 30;
 
+    toastSection.appendChild(toast);
+
+    setTimeout(() => {
+        toastSection.removeChild(toast);
+    }, 5000);
 }
 function creaFormulario() {
     //Tomamos el formulario de la pagina HTML
