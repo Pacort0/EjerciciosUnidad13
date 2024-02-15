@@ -120,8 +120,14 @@ tbody tr:nth-child(even){
     background-color: #0000000b;
 }
 
-tbody tr:hover{
+tbody tr:hover {
     background-color: burlywood;
+    cursor: pointer;
+    filter: brightness(0.835);
+}
+
+tbody tr {
+    transition: filter 1.5s ease; /* Add a smooth transition effect */
 }
 
 td {
@@ -206,20 +212,20 @@ td {
 }
 
 .imgEliminar img{
-    width: 80px;
-    height: 80px;
+    width: 55px;
+    height: 55px;
     margin-right: .5rem;
     vertical-align: middle;
 }
 
 .imgEliminar img:hover {
-    background-color:#ff0000;
-    filter: brightness(1.5); /* Example: increase brightness for hover effect */
+    background-color:#2F609E;
+    filter: brightness(1.8); /* Example: increase brightness for hover effect */
 }
 
 /* Additional styles for the trash icon */
 tbody .imgEliminar img {
-    transition: filter 1s ease; /* Add a smooth transition effect */
+    transition: filter 1.5s ease; /* Add a smooth transition effect */
 }
 
 .table_header img{
@@ -234,7 +240,11 @@ tbody .imgEliminar img {
     margin:10px;
 }
 
-#toastSection label{
+.agregar img:hover{
+    cursor:pointer;
+}
+
+#toastSection label {
     font-size: 30px;
     margin-left: 15px;
 }
