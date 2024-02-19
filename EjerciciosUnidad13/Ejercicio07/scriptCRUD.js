@@ -661,5 +661,4 @@ function creaFormulario() {
     overlayModal.appendChild(divForm);
 
     bodyTabla.appendChild(overlayModal);
-
 }

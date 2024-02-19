@@ -248,3 +248,18 @@ tbody .imgEliminar img {
     font-size: 30px;
     margin-left: 15px;
 }
+#GIFCargando {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    z-index: 2000; /* Adjust as needed, ensure it's above other elements */
+}
+
+
+
