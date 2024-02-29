@@ -25,7 +25,7 @@ var lista;
 var listaPersonas;
 var listaDepartamentos;
 var btnPersonas;
-var btnDepartamentos
+var btnDepartamentos;
 var pagina;
 var headerTabla;
 var gifCargando;
@@ -105,13 +105,9 @@ function inicioPagina() {
 
 }
 
-const optionGet = {
-    method: "GET"
-};
-
 //Pedimos la lista de departamentos
 function peticionDepartamentos() {
-    fetch("https://crudpaco.azurewebsites.net/api/departamentos", optionGet)
+    fetch("https://crudpaco.azurewebsites.net/api/departamentos", {method: "GET"})
         .then(response => {
             if (response.ok) { //Si la petición es correcta
                 return response.json(); //Parseamos los datos a json
@@ -346,12 +342,10 @@ function peticionPersonas(filtrado) {
     }
 }
 
-function insertar(event) {
+function insertar() {
 
     creaFormulario();
     overlay = document.getElementById("overlayModal");
-    const elementoAEditar = event.target;
-    console.log(event.target);
 
     overlay.style.display = "block";
 }
